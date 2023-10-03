@@ -1,0 +1,17 @@
+version: "3.4"
+services:
+    tts-api-zh:
+        container_name: tts-api-zh
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+            #extra_hosts:
+            #    - "host.docker.internal:172.17.0.1"
+        #enable hot reloading of api - useful for development - disable in prod
+        #entrypoint: '/start-reload.sh'
+        environment:
+            - WORKERS_PER_CORE=1
+            - TIMEOUT=90
+        ports:
+            - 8001:80
+        restart: always

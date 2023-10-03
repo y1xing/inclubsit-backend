@@ -1,0 +1,9 @@
+uvicorn[standard]==0.20.0
+gunicorn==20.1.0
+fastapi==0.101.0
+pydantic==2.1.1
+pydantic_core==2.4.0
+configargparse
+firebase_admin
+asyncio
+python-dotenv==0.19.2

@@ -1,0 +1,3 @@
+ADVERTISEMENT_COLLECTION = "advertisements"
+NOTICEBOARD_COLLECTION = "noticeboards"
+UTILS_COLLECTION = "utils"
