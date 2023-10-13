@@ -7,3 +7,4 @@ configargparse
 firebase_admin
 asyncio
 python-dotenv==0.19.2
+mysql-connector-python==8.1.0
