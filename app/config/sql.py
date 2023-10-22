@@ -1,4 +1,6 @@
-# SQL Class
+"""
+The SQL Connector class for the InClubSIT Backend.
+"""
 import asyncio
 from typing import Union
 
@@ -148,6 +150,37 @@ class SQLAdapter:
         # Return the data
         return data
 
+    def query(
+        self,
+        query: str,
+        params: tuple = None
+    ) -> list:
+        """Runs a query on the SQL database.
+
+        Args:
+            query (str): The query (as a prepared statement) to run.
+            params (tuple, optional): Parameters for the prepared query statement. Defaults to None.
+
+        Raises:
+            err: Any errors that occur during the query.
+
+        Returns:
+            list: The rows returned from the query.
+        """
+        cursor = self.db.cursor()
+        self.db.start_transaction()
+        data = []
+        try:
+            cursor.execute(query, params)
+        except mysql.connector.Error as err:
+            self.db.rollback()
+            raise err
+        finally:
+            self.db.commit()
+            data = cursor.fetchall()
+            cursor.close()
+        return data
+
     def add(self, collection_path, data, document_id=None):
         """
         Adds a document to the SQL database.
@@ -158,7 +191,7 @@ class SQLAdapter:
         Returns:
             None
         """
-        return "Add data to SQL"
+        raise NotImplementedError
 
     def update(self):
         """
@@ -170,7 +203,7 @@ class SQLAdapter:
         Returns:
             None
         """
-        return "Update data in SQL"
+        raise NotImplementedError
 
     def delete(self):
         """
@@ -183,6 +216,6 @@ class SQLAdapter:
             None
         """
 
-        return "Delete data from SQL"
+        raise NotImplementedError
 
     # Add additional methods here
