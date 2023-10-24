@@ -63,7 +63,7 @@ async def get_club(club_id: str, response: Response):
 
 
 # Change the body: dict to body: schemaModal
-@router.post("/")
+@router.post("/createClub")
 async def add_club(body: dict, response: Response):
     """
     POST: Add a new club
@@ -89,6 +89,36 @@ async def delete_club(club_id: str, response: Response):
 
     return {"message": "club deleted successfully"}
 
+#Club Member
+@router.post("/addMember", summary="Add Member")
+async def add_club(body: dict, response: Response):
+    """
+    POST: Add member to club
+    """
 
+    return {"message": "Add member to club successfully"}
 
+@router.delete("/removeMember", summary="Remove Member")
+async def delete_club(club_id: str, response: Response):
+    """
+    DELETE: Remove a member from club
+    """
 
+    return {"message": "Member removed successfully"}
+
+#Student Leader
+@router.post("/addStudentLeader", summary="Add Student Leader")
+async def add_club(body: dict, response: Response):
+    """
+    POST: Add Student Leader to club
+    """
+
+    return {"message": "Add member to club successfully"}
+
+@router.delete("/removeStudentLeader", summary="Remove Student Leader")
+async def delete_club(club_id: str, response: Response):
+    """
+    DELETE: Remove Student Leader from club
+    """
+
+    return {"message": "Student Leader removed successfully"}
