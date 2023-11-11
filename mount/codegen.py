@@ -9,7 +9,7 @@ random.seed(42)
 
 def main():
     initialise = None
-    with open('initialise.sql', 'r', encoding='utf-8') as f:
+    with open('template.sql', 'r', encoding='utf-8') as f:
         initialise = f.read()
     with open('ClubsData - ClubsInfo.csv', 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -24,7 +24,7 @@ def main():
                 else:
                     values[key] = [value]
 
-    with open("output.sql", "w+", encoding="utf-8") as f:
+    with open("initialise.sql", "w+", encoding="utf-8") as f:
         # Include initialisation
         f.write(initialise)
         club_categories = list(set(values["Club_Category"]))
