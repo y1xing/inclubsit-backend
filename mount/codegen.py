@@ -2,13 +2,22 @@ import csv
 import random
 import math
 import bcrypt
+import firebase_admin
+from firebase_admin import credentials, auth
 from tqdm.auto import tqdm
 
 BASE_STUDENT_ID = 2200000
 random.seed(42)
 
+
 def main():
     initialise = None
+
+    cred = credentials.Certificate("key.json")
+    app = firebase_admin.initialize_app(cred, {
+        'storageBucket': 'inclubsit.appspot.com'
+    })
+
     with open('template.sql', 'r', encoding='utf-8') as f:
         initialise = f.read()
     with open('ClubsData - ClubsInfo.csv', 'r', encoding='utf-8') as f:
@@ -44,12 +53,15 @@ def main():
 
         # Insert students
         print("Inserting Students")
-        pairs, students = generate_student_club_pairs(club_names=values["Club Name"])
+        pairs, students = generate_student_club_pairs(
+            club_names=values["Club Name"])
         for i, student in enumerate(tqdm(students)):
+            student_id = BASE_STUDENT_ID + i
             username = student.replace(' ', '').lower()
-            email = username + '@sit.singaporetech.edu.sg'
-            password = bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt())
-            f.write(f"INSERT INTO Account (AccountID, Username, Email, FirstName, LastName, Password) VALUES ({BASE_STUDENT_ID + i}, '{username}', '{email}', '{student.split()[0]}', '{student.split()[1]}', 0x{password.hex()});\n")
+            email = f'{student_id}@sit.singaporetech.edu.sg'
+            f.write(
+                f"INSERT INTO Account (StudentID, Username, Email, FirstName, LastName) VALUES ({student_id}, '{username}', '{email}', '{student.split()[0]}', '{student.split()[1]}');\n")
+            authenticate_user(email, str(student_id))
         f.write('\n')
 
         # Insert into ClubMember
@@ -57,7 +69,16 @@ def main():
         for club_name, students in pairs.items():
             club_id = values["Club Name"].index(club_name) + 1
             for student_data in students:
-                f.write(f"INSERT INTO ClubMember (ClubID, AccountID, AccountTypeID) VALUES ({club_id}, {student_data['student_id']}, {student_data['role']});\n")
+                f.write(
+                    f"INSERT INTO ClubMember (ClubID, StudentID, AccountTypeID) VALUES ({club_id}, {student_data['student_id']}, {student_data['role']});\n")
+
+
+def authenticate_user(email, student_id):
+    user = auth.create_user(
+        uid=student_id,
+        email=email,
+        password="password"
+    )
 
 
 def generate_names():
@@ -70,6 +91,7 @@ def generate_names():
 
     return random.choice(FIRST_NAMES) + ' ' + random.choice(LAST_NAMES)
 
+
 def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20, num_clubs_per_student=5, student_leader_pct=0.1):
     if club_names is None:
         club_names = [f"Club {i}" for i in range(num_clubs)]
@@ -80,18 +102,19 @@ def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20,
     student_club_pairs = {club_name: [] for club_name in club_names}
     for i, student in enumerate(students):
         clubs = random.choices(club_names, k=num_clubs_per_student)
-        student_data = {"name": student, "role": 2, "student_id": BASE_STUDENT_ID + i}
+        student_data = {"name": student, "role": 2,
+                        "student_id": BASE_STUDENT_ID + i}
         for club in clubs:
             student_club_pairs[club].append(student_data)
     # Add student leaders
     for club in club_names:
-        num_leaders = math.ceil(len(student_club_pairs[club]) * student_leader_pct)
+        num_leaders = math.ceil(
+            len(student_club_pairs[club]) * student_leader_pct)
         leaders = random.choices(student_club_pairs[club], k=num_leaders)
         for leader in leaders:
             leader["role"] = 1
-    
+
     return student_club_pairs, students
-    
 
 
 if __name__ == "__main__":

@@ -8,13 +8,12 @@ USE InClubSIT;
 
 -- Setup the Tables
 CREATE TABLE IF NOT EXISTS Account (
-    AccountID INT NOT NULL,
+    StudentID INT NOT NULL,
     Username VARCHAR(127) NOT NULL UNIQUE,
     Email VARCHAR(127) NOT NULL UNIQUE,
     FirstName VARCHAR(127) NOT NULL,
     LastName VARCHAR(127) NOT NULL,
-    Password BINARY(60) NOT NULL,
-    PRIMARY KEY (AccountID),
+    PRIMARY KEY (StudentID),
     UNIQUE (Username, Email)
 );
 
@@ -55,17 +54,17 @@ CREATE TABLE IF NOT EXISTS ClubCategoryInformation (
 CREATE TABLE IF NOT EXISTS ClubMember (
     ClubMemberID INT NOT NULL AUTO_INCREMENT,
     ClubID INT NOT NULL,
-    AccountID INT NOT NULL,
+    StudentID INT NOT NULL,
     AccountTypeID INT NOT NULL,
     PRIMARY KEY (ClubMemberID),
     FOREIGN KEY (ClubID)
         REFERENCES Club(ClubID),
-    FOREIGN KEY (AccountID)
-        REFERENCES Account(AccountID)
+    FOREIGN KEY (StudentID)
+        REFERENCES Account(StudentID)
         ON DELETE CASCADE,
     FOREIGN KEY (AccountTypeID)
         REFERENCES AccountType(AccountTypeID),
-    UNIQUE (ClubID, AccountID)
+    UNIQUE (ClubID, StudentID)
 );
 
 -- CREATE TABLE IF NOT EXISTS Interest (
