@@ -97,7 +97,6 @@ async def get_student_role(student_id: int, club_id: int, response: Response):
     """
     values = (student_id, club_id)
     try:
-        # Execute the query using the SQL adapter and fetch the result.
         result = sql_adapter.query(query, values)
 
         if result:
