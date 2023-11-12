@@ -7,14 +7,30 @@ CREATE DATABASE IF NOT EXISTS InClubSIT;
 USE InClubSIT;
 
 -- Setup the Tables
+CREATE TABLE IF NOT EXISTS Cluster (
+    ClusterID INT NOT NULL AUTO_INCREMENT,
+    ClusterName VARCHAR(127) NOT NULL UNIQUE,
+    PRIMARY KEY (ClusterID)
+);
+
+
+CREATE TABLE IF NOT EXISTS CourseInformation (
+    CourseID INT NOT NULL AUTO_INCREMENT,
+    CourseName VARCHAR(127) NOT NULL UNIQUE,
+    ClusterID INT NOT NULL,
+    PRIMARY KEY (CourseID),
+    FOREIGN KEY (ClusterID)
+        REFERENCES Cluster(ClusterID)
+);
+
 CREATE TABLE IF NOT EXISTS Account (
     StudentID INT NOT NULL,
-    Username VARCHAR(127) NOT NULL UNIQUE,
     Email VARCHAR(127) NOT NULL UNIQUE,
     FirstName VARCHAR(127) NOT NULL,
     LastName VARCHAR(127) NOT NULL,
-    PRIMARY KEY (StudentID),
-    UNIQUE (Username, Email)
+    MatriculationYear INT NOT NULL,
+    CourseID INT NOT NULL,
+    PRIMARY KEY (StudentID)
 );
 
 CREATE TABLE IF NOT EXISTS AccountType (
@@ -34,18 +50,17 @@ CREATE TABLE IF NOT EXISTS Club (
     ClubName VARCHAR(127) NOT NULL UNIQUE,
     ClubCategoryID INT NOT NULL,
     ClubDescription LONGTEXT NOT NULL,
+    ClubTrainingDates VARCHAR(127) NOT NULL,
+    ClubTrainingLocations VARCHAR(127) NOT NULL,
     PRIMARY KEY (ClubID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
 );
 
 CREATE TABLE IF NOT EXISTS ClubCategoryInformation (
-    ClubCategoryInfoID INT NOT NULL AUTO_INCREMENT,
     ClubCategoryID INT NOT NULL,
     CategoryDescription LONGTEXT NOT NULL,
-    ImageURL VARCHAR(511) NOT NULL,
-    OtherDetails LONGTEXT,
-    PRIMARY KEY (ClubCategoryInfoID),
+    PRIMARY KEY (ClubCategoryID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
 );
@@ -82,14 +97,7 @@ CREATE TABLE IF NOT EXISTS ClubMember (
 
 -- Dummy Data
 
-INSERT INTO AccountType (TypeName) VALUES ('Leader');
 INSERT INTO AccountType (TypeName) VALUES ('Member');
-
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Special Interest');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Global Citizenship');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Leadership');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Performing Arts');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Sports');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Student Chapter');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Student Management Comittee');
-
+INSERT INTO AccountType (TypeName) VALUES ('President');
+INSERT INTO AccountType (TypeName) VALUES ('Vice President');
+INSERT INTO AccountType (TypeName) VALUES ('Secretary');
