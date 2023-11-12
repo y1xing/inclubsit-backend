@@ -30,13 +30,22 @@ router = APIRouter(
 
 
 auth_responses = {
-    403: {"description": "Not enough privileges"},
+    200: {"description": "OK"},
+    201: {"description": "Created"},
+    204: {"description": "No Content"},
+    400: {"description": "Bad Request"},
+    401: {"description": "Unauthorized"},
+    403: {"description": "Forbidden"},
+    404: {"description": "Not Found"},
+    500: {"description": "Internal Server Error"},
 }
 
 # Initialize Database
 mongo_adapter = MongoAdapter()
 sql_adapter = SQLAdapter()
 firebase_adapter = Firebase()
+
+CLUB_UPDATE_PATH = "ClubUpdates"
 
 
 ######## GET REQUEST ############
@@ -63,8 +72,11 @@ async def get_club_updates(club_id: str, response: Response):
     """
     GET: Get updates from a club
     """
+    query = [("clubID", "==", int(club_id))]
 
-    return {"message": "club fetched successfully"}
+    result = firebase_adapter.get(CLUB_UPDATE_PATH, query=query)
+
+    return {"message": "club fetched successfully", "data": result}
 
 
 ######## POST REQUEST ############

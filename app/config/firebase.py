@@ -9,6 +9,7 @@ import asyncio
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
+
 class Firebase:
     _instance = None
 
@@ -39,12 +40,10 @@ class Firebase:
         self.db = firestore.client()
         self.bucket = storage.bucket()
 
-
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Firebase, cls).__new__(cls)
         return cls._instance
-
 
     def close_db(self):
         """
@@ -86,12 +85,13 @@ class Firebase:
                 filters = []
                 for filter in query:
                     field, operator, value = filter
-                    filters.append(firestore.AsyncFieldFilter(field, operator, value))
+                    filters.append(firestore.FieldFilter(
+                        field, operator, value))
 
                 if queryType == "or":
-                    final_query = firestore.AsyncOr(filters=filters)
+                    final_query = firestore.Or(filters=filters)
                 else:
-                    final_query = firestore.AsyncAnd(filters=filters)
+                    final_query = firestore.And(filters=filters)
 
                 collection_ref = collection_ref.where(filter=final_query)
                 documents = collection_ref.stream()
@@ -217,6 +217,3 @@ class Firebase:
             # Case 2: Increment a specific document
             doc_ref = collection_ref.document(document_id)
             doc_ref.update({field: firestore.Increment(value)})
-
-
-	
