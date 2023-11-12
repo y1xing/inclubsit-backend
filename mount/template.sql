@@ -58,8 +58,6 @@ CREATE TABLE IF NOT EXISTS Club (
 CREATE TABLE IF NOT EXISTS ClubCategoryInformation (
     ClubCategoryID INT NOT NULL,
     CategoryDescription LONGTEXT NOT NULL,
-    ImageURL VARCHAR(511),
-    OtherDetails LONGTEXT,
     PRIMARY KEY (ClubCategoryID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
@@ -97,8 +95,10 @@ CREATE TABLE IF NOT EXISTS ClubMember (
 
 -- Dummy Data
 
-INSERT INTO AccountType (TypeName) VALUES ('Leader');
 INSERT INTO AccountType (TypeName) VALUES ('Member');
+INSERT INTO AccountType (TypeName) VALUES ('President');
+INSERT INTO AccountType (TypeName) VALUES ('Vice President');
+INSERT INTO AccountType (TypeName) VALUES ('Secretary');
 
 INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Special Interest');
 INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Global Citizenship');

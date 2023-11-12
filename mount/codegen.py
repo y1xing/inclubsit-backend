@@ -2,7 +2,7 @@ import csv
 import random
 import math
 import firebase_admin
-from collections import OrderedDict
+from copy import deepcopy
 from firebase_admin import credentials, auth
 from tqdm.auto import tqdm
 
@@ -133,7 +133,7 @@ def generate_names():
     return random.choice(FIRST_NAMES) + ' ' + random.choice(LAST_NAMES)
 
 
-def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20, num_clubs_per_student=5, student_leader_pct=0.1):
+def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20, num_clubs_per_student=5, student_leader_pct=0.1, min_leaders=3):
     if club_names is None:
         club_names = [f"Club {i}" for i in range(num_clubs)]
     students = []
@@ -142,18 +142,19 @@ def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20,
         students = list(set(students))
     student_club_pairs = {club_name: [] for club_name in club_names}
     for i, student in enumerate(students):
-        clubs = random.choices(club_names, k=num_clubs_per_student)
-        student_data = {"name": student, "role": 2,
+        clubs = random.sample(club_names, k=num_clubs_per_student)
+        student_data = {"name": student, "role": 1,
                         "student_id": BASE_STUDENT_ID + i}
         for club in clubs:
-            student_club_pairs[club].append(student_data)
+            student_club_pairs[club].append(deepcopy(student_data))
     # Add student leaders
     for club in club_names:
-        num_leaders = math.ceil(
-            len(student_club_pairs[club]) * student_leader_pct)
-        leaders = random.choices(student_club_pairs[club], k=num_leaders)
-        for leader in leaders:
-            leader["role"] = 1
+        num_leaders = max(math.ceil(
+            len(student_club_pairs[club]) * student_leader_pct), min_leaders)
+        leaders = random.sample(
+            list(range(len(student_club_pairs[club]))), k=num_leaders)
+        for i, leader_idx in enumerate(leaders):
+            student_club_pairs[club][leader_idx]["role"] = min(i + 2, 4)
 
     return student_club_pairs, students
 
