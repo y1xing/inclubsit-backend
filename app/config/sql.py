@@ -83,13 +83,12 @@ class SQLAdapter:
         data = []
         try:
             cursor.execute(query, params)
+            data = cursor.fetchall()
         except mysql.connector.Error as err:
             self.db.rollback()
             raise err
-        finally:
-            data = cursor.fetchall()
-            self.db.commit()
-            cursor.close()
+        self.db.commit()
+        cursor.close()
         return data
 
     def add(self, collection_path, data, document_id=None):
