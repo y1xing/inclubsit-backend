@@ -39,21 +39,9 @@ sql_adapter = SQLAdapter()
 firebase_adapter = Firebase()
 
 
-#### Standard API endpoints ####
-@router.get("/all")
-async def all(response: Response):
-    """
-    GET: Fetch all the clubs data for the overview screen and redux
-    """
-    result = None
-
-    return {"message": "All clubs data fetched successfully", "data": result}
-
-# CRUD operations for single club
-
-
-@router.get("/{club_id}")
-async def get_club(club_id: str, response: Response):
+######## GET REQUEST ############
+@router.get("/{club_id}/profile")
+async def get_club_profile(club_id: str, response: Response):
     """
     GET: Fetch a single club
     """
@@ -61,38 +49,36 @@ async def get_club(club_id: str, response: Response):
     return {"message": "club fetched successfully"}
 
 
-# Change the body: dict to body: schemaModal
-@router.post("/createClub")
-async def add_club(body: dict, response: Response):
+@router.get("/{club_id}/members")
+async def get_club_members(club_id: str, response: Response):
     """
-    POST: Add a new club
-    """
-
-    return {"message": "club added successfully"}
-
-
-@router.put("/{club_id}")
-async def update_club(club_id: str, response: Response):
-    """
-    PUT: Update a club
+    GET: Get members from a club
     """
 
-    return {"message": "club updated successfully"}
+    return {"message": "club fetched successfully"}
 
 
-@router.delete("/{club_id}")
-async def delete_club(club_id: str, response: Response):
+@router.get("/{club_id}/updates")
+async def get_club_updates(club_id: str, response: Response):
     """
-    DELETE: Delete a club
+    GET: Get updates from a club
     """
 
-    return {"message": "club deleted successfully"}
-
-# Club Member
+    return {"message": "club fetched successfully"}
 
 
-@router.post("/addMember", summary="Add Member")
-async def add_club(body: dict, response: Response):
+######## POST REQUEST ############
+@router.post("/{club_id}/updates")
+async def post_club_updates(club_id: str, body: dict, response: Response):
+    """
+    GET: Add a new update for a club
+    """
+
+    return {"message": "club fetched successfully"}
+
+
+@router.post("/{club_id}/member", summary="Add Member")
+async def add_club_member(body: dict, response: Response):
     """
     POST: Add member to club
     """
@@ -100,30 +86,39 @@ async def add_club(body: dict, response: Response):
     return {"message": "Add member to club successfully"}
 
 
-@router.delete("/removeMember", summary="Remove Member")
-async def delete_club(club_id: str, response: Response):
+######## UPDATE/PUT REQUEST ############
+@router.put("/{club_id}/profile")
+async def update_club_profile(club_id: str, response: Response):
+    """
+    PUT: Update a club profile
+    """
+
+    return {"message": "club updated successfully"}
+
+
+@router.put("/{club_id}/updates")
+async def update_club_updates(club_id: str, body: dict, response: Response):
+    """
+    GET: Add a new update for a club
+    """
+
+    return {"message": "club fetched successfully"}
+
+
+######## DELETE REQUEST ############
+@router.delete("/{update_id}/updates")
+async def delete_club_updates(update_id: str, response: Response):
+    """
+    DELETE: Delete a club
+    """
+
+    return {"message": "club deleted successfully"}
+
+
+@router.delete("/{club_id}/member", summary="Remove Member")
+async def delete_club_member(club_id: str, response: Response):
     """
     DELETE: Remove a member from club
     """
 
     return {"message": "Member removed successfully"}
-
-# Student Leader
-
-
-@router.post("/addStudentLeader", summary="Add Student Leader")
-async def add_club(body: dict, response: Response):
-    """
-    POST: Add Student Leader to club
-    """
-
-    return {"message": "Add member to club successfully"}
-
-
-@router.delete("/removeStudentLeader", summary="Remove Student Leader")
-async def delete_club(club_id: str, response: Response):
-    """
-    DELETE: Remove Student Leader from club
-    """
-
-    return {"message": "Student Leader removed successfully"}
