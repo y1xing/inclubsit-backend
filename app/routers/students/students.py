@@ -30,7 +30,14 @@ router = APIRouter(
 
 
 auth_responses = {
-    403: {"description": "Not enough privileges"},
+    200: {"description": "OK"},
+    201: {"description": "Created"},
+    204: {"description": "No Content"},
+    400: {"description": "Bad Request"},
+    401: {"description": "Unauthorized"},
+    403: {"description": "Forbidden"},
+    404: {"description": "Not Found"},
+    500: {"description": "Internal Server Error"},
 }
 
 # Initialize Database
