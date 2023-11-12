@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS Club (
     ClubName VARCHAR(127) NOT NULL UNIQUE,
     ClubCategoryID INT NOT NULL,
     ClubDescription LONGTEXT NOT NULL,
+    ClubTrainingDates VARCHAR(127) NOT NULL,
+    ClubTrainingLocations VARCHAR(127) NOT NULL,
     PRIMARY KEY (ClubID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
@@ -99,12 +101,3 @@ INSERT INTO AccountType (TypeName) VALUES ('Member');
 INSERT INTO AccountType (TypeName) VALUES ('President');
 INSERT INTO AccountType (TypeName) VALUES ('Vice President');
 INSERT INTO AccountType (TypeName) VALUES ('Secretary');
-
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Special Interest');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Global Citizenship');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Leadership');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Performing Arts');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Sports');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Student Chapter');
-INSERT INTO ClubCategory (ClubCategoryName) VALUES ('Student Management Comittee');
-

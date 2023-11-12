@@ -76,11 +76,17 @@ def main():
                 f.write(
                     f"INSERT INTO CourseInformation (CourseName, ClusterID) VALUES ('{course}', {cluster_id + 1});\n")
 
+        # Insert Club Categories
+        print("Inserting Club Categories")
+        for club_category in club_categories:
+            f.write(
+                f"INSERT INTO ClubCategory (ClubCategoryName) VALUES ('{club_category}');\n")
+
         # Insert clubs
         print("Inserting Clubs")
-        for idx, (club_name, description) in enumerate(zip(values["Club Name"], values["Description"])):
+        for idx, (club_name, description, train_dates, train_loc) in enumerate(zip(values["Club Name"], values["Description"], values["Training_Dates"], values["Training Locations"])):
             f.write(
-                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}');\n")
+                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}');\n")
         f.write('\n')
 
         # Insert club categories info
