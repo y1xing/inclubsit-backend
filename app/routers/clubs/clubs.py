@@ -34,9 +34,9 @@ auth_responses = {
 }
 
 # Initialize Database
-crud = Firebase()
 mongo_adapter = MongoAdapter()
 sql_adapter = SQLAdapter()
+firebase_adapter = Firebase()
 
 
 #### Standard API endpoints ####
@@ -45,8 +45,7 @@ async def all(response: Response):
     """
     GET: Fetch all the clubs data for the overview screen and redux
     """
-
-    result = crud.get('club')
+    result = None
 
     return {"message": "All clubs data fetched successfully", "data": result}
 
@@ -89,7 +88,9 @@ async def delete_club(club_id: str, response: Response):
 
     return {"message": "club deleted successfully"}
 
-#Club Member
+# Club Member
+
+
 @router.post("/addMember", summary="Add Member")
 async def add_club(body: dict, response: Response):
     """
@@ -97,6 +98,7 @@ async def add_club(body: dict, response: Response):
     """
 
     return {"message": "Add member to club successfully"}
+
 
 @router.delete("/removeMember", summary="Remove Member")
 async def delete_club(club_id: str, response: Response):
@@ -106,7 +108,9 @@ async def delete_club(club_id: str, response: Response):
 
     return {"message": "Member removed successfully"}
 
-#Student Leader
+# Student Leader
+
+
 @router.post("/addStudentLeader", summary="Add Student Leader")
 async def add_club(body: dict, response: Response):
     """
@@ -114,6 +118,7 @@ async def add_club(body: dict, response: Response):
     """
 
     return {"message": "Add member to club successfully"}
+
 
 @router.delete("/removeStudentLeader", summary="Remove Student Leader")
 async def delete_club(club_id: str, response: Response):

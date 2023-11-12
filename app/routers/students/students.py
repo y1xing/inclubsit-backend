@@ -34,11 +34,12 @@ auth_responses = {
 }
 
 # Initialize Database
-crud = Firebase()
 mongo_adapter = MongoAdapter()
 sql_adapter = SQLAdapter()
+firebase_adapter = Firebase()
 
 #### Standard API endpoints ####
+
 
 @router.get("/all")
 async def all(response: Response):
@@ -87,7 +88,3 @@ async def delete_student(student_id: str, response: Response):
     """
 
     return {"message": "student deleted successfully"}
-
-
-
-

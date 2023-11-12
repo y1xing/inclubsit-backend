@@ -7,6 +7,7 @@ import uvicorn
 from routers.example import example
 from routers.clubs import clubs
 from routers.students import students
+from routers.categories import categories
 
 # Import the different database adapters
 from config.firebase import Firebase
@@ -26,6 +27,7 @@ app = FastAPI(title="InClubSIT Backend", version="0.5")
 app.include_router(example.router)
 app.include_router(students.router)
 app.include_router(clubs.router)
+app.include_router(categories.router)
 
 # Violating PEP 8 to overcome circular imports
 
@@ -33,6 +35,8 @@ mongo_adapter = None
 sql_adapter = None
 
 # Initialise connect with MongoDB and SQL
+
+
 async def initialise_database():
     # Initialiase the DB
     global mongo_adapter
@@ -41,6 +45,7 @@ async def initialise_database():
     print("Initialising DB")
     mongo_adapter = MongoAdapter()
     sql_adapter = SQLAdapter()
+    firebase_adapter = Firebase()
 
 # Close the database
 
