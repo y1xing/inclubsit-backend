@@ -1,13 +1,26 @@
 import csv
 import random
 import math
-import bcrypt
 import firebase_admin
+from collections import OrderedDict
 from firebase_admin import credentials, auth
 from tqdm.auto import tqdm
 
 BASE_STUDENT_ID = 2200000
 random.seed(42)
+
+CLUSTER_COURSES = [
+    ("Business, Communication and Design", ["Accountancy", "Air Transport Management",
+     "Hospitality Business", "Digital Communications and Integrated Media"]),
+    ("Engineering", ["Aerospace Engineering", "Aircraft Systems Engineering", "Civil Engineering", "Electronics and Data Engineering", "Electrical Power Engineering", "Engineering Systems", "Mechanical Design and Manufacturing Engineering", "Marine Engineering", "Mechatronics Systems", "Mechanical Engineering",
+     "Naval Architecture and Marine Engineering", "Naval Architecture", "Robotics Systems", "Offshore Engineering", "Sustainable Infrastructure Engineering (Land)", "Sustainable Infrastructure Engineering (Building Services)", "Sustainable Built Environment", "Systems Engineering (ElectroMechanical Systems)"]),
+    ("Food, Chemical and Biotechnology", ["Chemical Engineering (Joint with Newcastle University)",
+     "Chemical Engineering (Joint with Technical University of Munich)", "Pharmaceutical Engineering", "Food Technology"]),
+    ("Health and Social Sciences", ["Diagnostic Radiotherapy", "Dietetics and Nutrition", "Nursing",
+     "Occupational Therapy", "Physiotherapy", "Radiation Therapy", "Speech and Language Therapy"]),
+    ("Infocomm Technology", ["Applied Artificial Intelligence", "Applied Computing", "Computer Engineering", "Computer Science in Interactive Media and Game Development", "Computer Science in Real-Time Interactive Simulation", "Computing Science",
+     "Digital Supply Chain", "Information and Communications Technology (Information Security)", "Information and Communications Technology (Software Engineering)", "Telematics (Intelligent Transportation Systems Engineering)"])
+]
 
 
 def main():
@@ -32,17 +45,36 @@ def main():
                     values[key].append(value)
                 else:
                     values[key] = [value]
+    with open('ClubsData - ClubCategoryInformation.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        club_cat_values = {}
+        for i, row in enumerate(reader):
+            for key in row.keys():
+                value = row[key]
+                value = value.replace("'", "''").replace(
+                    "’", "''").replace("‘", "''").rstrip()
+                if key in club_cat_values.keys():
+                    club_cat_values[key].append(value)
+                else:
+                    club_cat_values[key] = [value]
 
     with open("initialise.sql", "w+", encoding="utf-8") as f:
         # Include initialisation
         f.write(initialise)
         club_categories = list(set(values["Club_Category"]))
-        # Insert club categories
-        print("Inserting Club Categories")
-        for category in club_categories:
+
+        # Insert clusters
+        print("Inserting Clusters")
+        for cluster_name, _ in CLUSTER_COURSES:
             f.write(
-                f"INSERT INTO ClubCategory (ClubCategoryName) VALUES ('{category}');\n")
-        f.write('\n')
+                f"INSERT INTO Cluster (ClusterName) VALUES ('{cluster_name}');\n")
+
+        # Insert courses
+        print("Inserting Courses")
+        for cluster_id, (_, courses) in enumerate(CLUSTER_COURSES):
+            for course in courses:
+                f.write(
+                    f"INSERT INTO CourseInformation (CourseName, ClusterID) VALUES ('{course}', {cluster_id + 1});\n")
 
         # Insert clubs
         print("Inserting Clubs")
@@ -51,17 +83,26 @@ def main():
                 f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}');\n")
         f.write('\n')
 
+        # Insert club categories info
+        print("Inserting Club Categories Information")
+        for idx, (club_cat_id, description) in enumerate(zip(club_cat_values["ClubCategoryID"], club_cat_values['Description'])):
+            f.write(
+                f"INSERT INTO ClubCategoryInformation (ClubCategoryID, CategoryDescription) VALUES ({club_cat_id}, '{description}');\n"
+            )
+
         # Insert students
         print("Inserting Students")
         pairs, students = generate_student_club_pairs(
             club_names=values["Club Name"])
+        courses = [name for x in CLUSTER_COURSES for name in x[1]]
         for i, student in enumerate(tqdm(students)):
             student_id = BASE_STUDENT_ID + i
-            username = student.replace(' ', '').lower()
             email = f'{student_id}@sit.singaporetech.edu.sg'
+            course_id = courses.index(random.choice(courses)) + 1
             f.write(
-                f"INSERT INTO Account (StudentID, Username, Email, FirstName, LastName) VALUES ({student_id}, '{username}', '{email}', '{student.split()[0]}', '{student.split()[1]}');\n")
-            authenticate_user(email, str(student_id))
+                f"INSERT INTO Account (StudentID, Email, FirstName, LastName, MatriculationYear, CourseID) VALUES ({student_id}, '{email}', '{student.split()[0]}', '{student.split()[1]}', 2022, '{course_id}');\n")
+            # ! UNCOMMENT TO CREATE USERS IN FIREBASE
+            # authenticate_user(email, str(student_id))
         f.write('\n')
 
         # Insert into ClubMember

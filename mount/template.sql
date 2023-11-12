@@ -7,14 +7,30 @@ CREATE DATABASE IF NOT EXISTS InClubSIT;
 USE InClubSIT;
 
 -- Setup the Tables
+CREATE TABLE IF NOT EXISTS Cluster (
+    ClusterID INT NOT NULL AUTO_INCREMENT,
+    ClusterName VARCHAR(127) NOT NULL UNIQUE,
+    PRIMARY KEY (ClusterID)
+);
+
+
+CREATE TABLE IF NOT EXISTS CourseInformation (
+    CourseID INT NOT NULL AUTO_INCREMENT,
+    CourseName VARCHAR(127) NOT NULL UNIQUE,
+    ClusterID INT NOT NULL,
+    PRIMARY KEY (CourseID),
+    FOREIGN KEY (ClusterID)
+        REFERENCES Cluster(ClusterID)
+);
+
 CREATE TABLE IF NOT EXISTS Account (
     StudentID INT NOT NULL,
-    Username VARCHAR(127) NOT NULL UNIQUE,
     Email VARCHAR(127) NOT NULL UNIQUE,
     FirstName VARCHAR(127) NOT NULL,
     LastName VARCHAR(127) NOT NULL,
-    PRIMARY KEY (StudentID),
-    UNIQUE (Username, Email)
+    MatriculationYear INT NOT NULL,
+    CourseID INT NOT NULL,
+    PRIMARY KEY (StudentID)
 );
 
 CREATE TABLE IF NOT EXISTS AccountType (
@@ -40,12 +56,11 @@ CREATE TABLE IF NOT EXISTS Club (
 );
 
 CREATE TABLE IF NOT EXISTS ClubCategoryInformation (
-    ClubCategoryInfoID INT NOT NULL AUTO_INCREMENT,
     ClubCategoryID INT NOT NULL,
     CategoryDescription LONGTEXT NOT NULL,
-    ImageURL VARCHAR(511) NOT NULL,
+    ImageURL VARCHAR(511),
     OtherDetails LONGTEXT,
-    PRIMARY KEY (ClubCategoryInfoID),
+    PRIMARY KEY (ClubCategoryID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
 );
