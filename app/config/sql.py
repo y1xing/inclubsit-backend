@@ -87,7 +87,7 @@ class SQLAdapter:
             self.db.rollback()
             raise err
         finally:
-            data = cursor.fetchall()
+            #data = cursor.fetchall()
             self.db.commit()
             cursor.close()
         return data

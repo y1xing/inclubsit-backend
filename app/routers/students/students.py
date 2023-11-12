@@ -86,11 +86,24 @@ async def get_student_updates(student_id: str, response: Response):
 
 
 @router.get("/{student_id}/{club_id}/role")
-async def get_student_updates(student_id: str, club_id: str, response: Response):
+async def get_student_role(student_id: int, club_id: int, response: Response):
     """
     GET: Get the role of the student in a club
     """
+   
+    query = """
+    SELECT AccountTypeID FROM ClubMember
+    WHERE StudentID = %s AND ClubID = %s;
+    """
+    values = (student_id, club_id)
+    try:
+        sql_adapter.query(query, values)
+        result = firebase_adapter.get("AccountType", query=query)
 
-    result = None
-
-    return {"message": "All students data fetched successfully", "data": result}
+        if result:
+            return {"message": "AccountType fetched successfully", "data": result}
+        else:
+            return {"message": "Student is not a member of the club"}
+    except Exception as e:
+        response.status_code = 500
+        return {"message": "An error occurred while fetching the student's role.", "error": str(e)}

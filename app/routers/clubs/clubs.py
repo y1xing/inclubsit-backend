@@ -89,13 +89,36 @@ async def post_club_updates(club_id: str, body: dict, response: Response):
     return {"message": "club fetched successfully"}
 
 
+# @router.post("/{club_id}/member", summary="Add Member")
+# async def add_club_member(body: dict, response: Response):
+#     """
+#     POST: Add member to club
+#     """
+
+
+#     return {"message": "Add member to club successfully"}
+
 @router.post("/{club_id}/member", summary="Add Member")
-async def add_club_member(body: dict, response: Response):
+async def add_club_member(club_id: int, body: dict, response: Response):
     """
     POST: Add member to club
     """
+    student_id = body.get("StudentID")
+    account_type_id = 1
 
-    return {"message": "Add member to club successfully"}
+    if not student_id:
+        raise HTTPException(status_code=400, detail="Missing studentID.")
+
+    insert_query = "INSERT INTO ClubMember (ClubID, StudentID, AccountTypeID) VALUES (%s, %s, %s);"
+    values = (club_id, student_id,1)
+
+    try:
+        sql_adapter.query(insert_query, values)
+    except Exception as e:
+        response.status_code = 500
+        return {"message": "An error occurred.", "error": str(e)}
+
+    return {"message": "Member added to club successfully"}
 
 
 ######## UPDATE/PUT REQUEST ############
@@ -121,16 +144,30 @@ async def update_club_updates(club_id: str, body: dict, response: Response):
 @router.delete("/{update_id}/updates")
 async def delete_club_updates(update_id: str, response: Response):
     """
-    DELETE: Delete a club
+    DELETE: Delete a club update
     """
+    query = firebase_adapter.delete(CLUB_UPDATE_PATH, update_id)
 
-    return {"message": "club deleted successfully"}
+    return {"message": "club update deleted successfully"}
+    
 
-
-@router.delete("/{club_id}/member", summary="Remove Member")
-async def delete_club_member(club_id: str, response: Response):
+@router.delete("/clubs/{club_id}/member", summary="Remove Member")
+async def delete_club_member(club_id: int,body: dict, response: Response):
     """
-    DELETE: Remove a member from club
+    DELETE: Remove a member from a club
     """
+    student_id = body.get("StudentID")
 
-    return {"message": "Member removed successfully"}
+    if not student_id:
+        raise HTTPException(status_code=400, detail="Missing studentID.")
+
+    delete_query = "DELETE FROM ClubMember WHERE ClubID = %s AND StudentID = %s;"
+    values = (club_id, student_id)
+
+    try:
+        sql_adapter.query(delete_query, values)
+    except Exception as e:
+        response.status_code = 500
+        return {"message": "An error occurred.", "error": str(e)}
+
+    return {"message": "Member removed from club successfully"}
