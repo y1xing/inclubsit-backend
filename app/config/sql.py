@@ -6,6 +6,9 @@ import os
 from dotenv import dotenv_values
 import mysql.connector
 from mysql.connector import errorcode
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class SQLAdapter:
