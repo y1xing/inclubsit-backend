@@ -33,6 +33,7 @@ app.include_router(categories.router)
 
 mongo_adapter = None
 sql_adapter = None
+firebase_adapter = None
 
 # Initialise connect with MongoDB and SQL
 
@@ -41,6 +42,7 @@ async def initialise_database():
     # Initialiase the DB
     global mongo_adapter
     global sql_adapter
+    global firebase_adapter
 
     print("Initialising DB")
     mongo_adapter = MongoAdapter()
