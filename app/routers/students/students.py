@@ -97,11 +97,12 @@ async def get_student_role(student_id: int, club_id: int, response: Response):
     """
     values = (student_id, club_id)
     try:
-        sql_adapter.query(query, values)
-        result = firebase_adapter.get("AccountType", query=query)
+        # Execute the query using the SQL adapter and fetch the result.
+        result = sql_adapter.query(query, values)
 
         if result:
-            return {"message": "AccountType fetched successfully", "data": result}
+            account_type_id = result[0][0]
+            return {"message": "AccountType fetched successfully", "data": account_type_id}
         else:
             return {"message": "Student is not a member of the club"}
     except Exception as e:
