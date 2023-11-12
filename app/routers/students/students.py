@@ -38,53 +38,59 @@ mongo_adapter = MongoAdapter()
 sql_adapter = SQLAdapter()
 firebase_adapter = Firebase()
 
-#### Standard API endpoints ####
+############ GET REQUESTS ############
 
 
-@router.get("/all")
-async def all(response: Response):
+@router.get("/{student_id}/updates")
+async def get_student_updates(student_id: str, response: Response):
     """
-    GET: Fetch all the students data for the overview screen and redux
+    GET: Get all the updates from the clubs that student is part of
     """
 
-    result = crud.get('student')
+    result = None
 
     return {"message": "All students data fetched successfully", "data": result}
 
-# CRUD operations for single student
 
-
-@router.get("/{student_id}")
-async def get_student(student_id: str, response: Response):
+@router.get("/{student_id}/recommended")
+async def get_student_recommended(student_id: str, response: Response):
     """
-    GET: Fetch a single student
+    GET: Get the recommendec clubs for a student
     """
 
-    return {"message": "student fetched successfully"}
+    result = None
+
+    return {"message": "All students data fetched successfully", "data": result}
 
 
-@router.post("/")
-async def add_student(body: dict, response: Response):
+@router.get("/{student_id}/clubs")
+async def get_student_clubs(student_id: str, response: Response):
     """
-    POST: Add a new student
-    """
-
-    return {"message": "student added successfully"}
-
-
-@router.put("/{student_id}")
-async def update_student(student_id: str, response: Response):
-    """
-    PUT: Update a student
+    GET: Get all the clubs the student is part of
     """
 
-    return {"message": "student updated successfully"}
+    result = None
+
+    return {"message": "All students data fetched successfully", "data": result}
 
 
-@router.delete("/{student_id}")
-async def delete_student(student_id: str, response: Response):
+@router.get("/{student_id}/profile")
+async def get_student_updates(student_id: str, response: Response):
     """
-    DELETE: Delete a student
+    GET: Get the profile of the student
     """
 
-    return {"message": "student deleted successfully"}
+    result = None
+
+    return {"message": "All students data fetched successfully", "data": result}
+
+
+@router.get("/{student_id}/{club_id}/role")
+async def get_student_updates(student_id: str, club_id: str, response: Response):
+    """
+    GET: Get the role of the student in a club
+    """
+
+    result = None
+
+    return {"message": "All students data fetched successfully", "data": result}

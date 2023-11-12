@@ -43,8 +43,19 @@ firebase_adapter = Firebase()
 @router.get("/all")
 async def all(response: Response):
     """
-    GET: Fetch all the clubs data for the overview screen and redux
+    GET: Get all categories information
     """
     result = None
 
     return {"message": "All clubs data fetched successfully", "data": result}
+
+
+@router.get("/{category_id}")
+async def get_category(category_id: str, response: Response):
+    """
+    GET: Get information on a category
+    """
+
+    result = None
+
+    return {"message": "Category data fetched successfully", "data": result}
