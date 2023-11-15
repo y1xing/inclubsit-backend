@@ -85,8 +85,10 @@ def main():
         # Insert clubs
         print("Inserting Clubs")
         for idx, (club_name, description, train_dates, train_loc) in enumerate(zip(values["Club Name"], values["Description"], values["Training_Dates"], values["Training Locations"])):
+            club_email = f'sit_{club_name.replace(" ", "").lower()}@sit.singaporetech.edu.sg'
+            club_insta = f'@sit_{club_name.replace(" ", "").lower()}'
             f.write(
-                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}');\n")
+                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations, ClubEmail, ClubInstagram) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}', '{club_email}', '{club_insta}');\n")
         f.write('\n')
 
         # Insert club categories info

@@ -30,7 +30,8 @@ router = APIRouter(
 
 
 auth_responses = {
-    403: {"description": "Not enough privileges"},
+    403: {"description": "Not enough privileges."},
+    404: {"description": "Resource not found."}
 }
 
 # Initialize Database
@@ -75,14 +76,20 @@ async def get_student_clubs(student_id: str, response: Response):
 
 
 @router.get("/{student_id}/profile")
-async def get_student_updates(student_id: str, response: Response):
+async def get_student_profile(student_id: int, response: Response):
     """
     GET: Get the profile of the student
     """
 
-    result = None
+    columns = sql_adapter.query("SHOW COLUMNS FROM Account;")
+    row = sql_adapter.query(
+        "SELECT * FROM Account WHERE StudentID = %s", (student_id,))
+    if len(row) == 0:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(status_code=404, detail="Student not found.")
+    result = dict(zip((column[0] for column in columns), row[0]))
 
-    return {"message": "All students data fetched successfully", "data": result}
+    return {"message": "Student's data fetched successfully.", "data": result}
 
 
 @router.get("/{student_id}/{club_id}/role")
@@ -90,20 +97,20 @@ async def get_student_role(student_id: int, club_id: int, response: Response):
     """
     GET: Get the role of the student in a club
     """
-   
-    query = """
-    SELECT AccountTypeID FROM ClubMember
-    WHERE StudentID = %s AND ClubID = %s;
-    """
-    values = (student_id, club_id)
-    try:
-        result = sql_adapter.query(query, values)
 
-        if result:
-            account_type_id = result[0][0]
-            return {"message": "AccountType fetched successfully", "data": account_type_id}
-        else:
-            return {"message": "Student is not a member of the club"}
-    except Exception as e:
-        response.status_code = 500
-        return {"message": "An error occurred while fetching the student's role.", "error": str(e)}
+    row = sql_adapter.query(
+        "SELECT at.AccountTypeID, at.TypeName FROM ClubMember cm LEFT JOIN AccountType at ON cm.AccountTypeID = at.AccountTypeID WHERE cm.StudentID = %s AND cm.ClubID = %s", (
+            student_id, club_id,)
+    )
+
+    if len(row) == 0:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(
+            status_code=404, detail="Student not found or not part of the club.")
+
+    result = {
+        "account_type_id": row[0][0],
+        "account_type_name": row[0][1]
+    }
+
+    return {"message": "Student's role fetched successfully", "data": result}

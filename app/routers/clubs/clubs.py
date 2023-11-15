@@ -50,21 +50,46 @@ CLUB_UPDATE_PATH = "ClubUpdates"
 
 ######## GET REQUEST ############
 @router.get("/{club_id}/profile")
-async def get_club_profile(club_id: str, response: Response):
+async def get_club_profile(club_id: int, response: Response):
     """
     GET: Fetch a single club
     """
+    columns = sql_adapter.query("SHOW COLUMNS FROM Club;")
+    columns = [column[0] for column in columns]
+    rows = sql_adapter.query(
+        "SELECT c.ClubID, c.ClubName, cc.ClubCategoryName, c.ClubDescription, c.ClubTrainingDates, c.ClubTrainingLocations, c.ClubEmail, c.ClubInstagram FROM Club c LEFT JOIN ClubCategory cc ON c.ClubCategoryID = cc.ClubCategoryID WHERE c.ClubID = %s", (
+            club_id, )
+    )
+    if len(rows) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Club not found")
 
-    return {"message": "club fetched successfully"}
+    result = dict(zip(columns, rows[0]))
+
+    return {"message": "club fetched successfully", "data": result}
 
 
 @router.get("/{club_id}/members")
-async def get_club_members(club_id: str, response: Response):
+async def get_club_members(club_id: int, response: Response):
     """
     GET: Get members from a club
     """
 
-    return {"message": "club fetched successfully"}
+    rows = sql_adapter.query(
+        "SELECT a.FirstName, a.LastName, at.TypeName, a.MatriculationYear, ci.CourseName FROM Account a RIGHT JOIN ClubMember cm ON a.StudentID = cm.StudentID LEFT JOIN AccountType at ON cm.AccountTypeID = at.AccountTypeID LEFT JOIN CourseInformation ci ON a.CourseID = ci.CourseID WHERE cm.ClubID = %s",
+        (club_id,)
+    )
+    if len(rows) == 0:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Club not found")
+
+    result = [{
+        "first_name": first_name, "last_name": last_name, "role": role,
+        "matriculation_year": matriculation_year, "course_name": course_name
+    } for first_name, last_name, role, matriculation_year, course_name in rows]
+
+    return {"message": "club fetched successfully", "data": result}
 
 
 @router.get("/{club_id}/updates")

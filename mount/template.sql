@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS Club (
     ClubDescription LONGTEXT NOT NULL,
     ClubTrainingDates VARCHAR(127) NOT NULL,
     ClubTrainingLocations VARCHAR(127) NOT NULL,
+    ClubEmail VARCHAR(127) NOT NULL UNIQUE,
+    ClubInstagram VARCHAR(127) NOT NULL UNIQUE,
     PRIMARY KEY (ClubID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
