@@ -50,23 +50,50 @@ firebase_adapter = Firebase()
 @router.get("/all")
 async def all(response: Response):
     """
-    GET: Get all categories information
+    GET: Get all categories information including the member count
     """
     try:
-        result = sql_adapter.query("SELECT * FROM ClubCategory")
+        result = sql_adapter.query(
+            "SELECT cc.ClubCategoryName, COUNT(*) FROM Club c LEFT JOIN ClubCategory cc on c.ClubCategoryID = cc.ClubCategoryID GROUP BY cc.ClubCategoryID")
+
+        result_formatted = [{"name": category[0],
+                             "clubs": category[1]} for category in result]
+
     except Exception as e:
         print(e)
         return {"message": "Error in fetching categories"}, 400
 
-    return {"message": "All categories data fetched", "data": result}, 200
+    return {"message": "All categories data fetched", "data": result_formatted}, 200
 
 
 @router.get("/{category_id}")
 async def get_category(category_id: str, response: Response):
     """
-    GET: Get information on a category
+    GET: Get information on a category and its clubs
+    sql.query("SELECT * FROM Club WHERE ClubID = %s", (1,))
     """
+    try:
+        clubs = sql_adapter.query(
+            "SELECT * FROM Club WHERE ClubCategoryID = %s", (category_id, ))
+        category_info = sql_adapter.query(
+            "SELECT * FROM ClubCategoryInformation WHERE ClubCategoryID = %s", (category_id, ))[0]
 
-    result = None
+        result_formmated = {
+            "category_info": {
+                "title": category_info[1],
+            },
+            "clubs": [
+                {
+                    "id": club[0],
+                    "title": club[1],
+                    "members": "1-10",
+                    "training": "Every Friday, 6pm to 8pm",
+                    "location": "Dover Campus",
+                } for club in clubs]
+        }
 
-    return {"message": "Category data fetched successfully", "data": result}
+    except Exception as e:
+        print(e)
+        return {"message": "Error in fetching category"}, 400
+
+    return {"message": "Category data fetched successfully", "data": result_formmated}
