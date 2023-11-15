@@ -69,9 +69,9 @@ async def all(response: Response):
 @router.get("/{category_id}")
 async def get_category(category_id: str, response: Response):
     """
-    GET: Get information on a category and its clubs
-    sql.query("SELECT * FROM Club WHERE ClubID = %s", (1,))
+    GET: Get information on a category
     """
+
     try:
         clubs = sql_adapter.query(
             "SELECT * FROM Club WHERE ClubCategoryID = %s", (category_id, ))
