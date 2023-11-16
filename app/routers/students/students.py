@@ -124,13 +124,15 @@ async def get_student_profile(student_id: int, response: Response):
     JOIN CourseInformation ci ON a.CourseID = ci.CourseID
     WHERE a.StudentID = %s;
     """
+    columns = sql_adapter.query("SHOW COLUMNS FROM Account;")
+    columns += sql_adapter.query("SHOW COLUMNS FROM CourseInformation WHERE Field='CourseName';")
     row = sql_adapter.query(query, (student_id,))
     
     if len(row) == 0:
         response.status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
 
-    result = row[0] if row else {}
+    result = dict(zip((column[0] for column in columns), row[0]))
 
     return {"message": "Student's data fetched successfully.", "data": result}
 
