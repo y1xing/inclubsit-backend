@@ -113,24 +113,26 @@ async def get_student_clubs(student_id: str, response: Response):
     
     return {"message": "All student's club data fetched successfully", "data": clubs}
 
-
 @router.get("/{student_id}/profile")
 async def get_student_profile(student_id: int, response: Response):
     """
     GET: Get the profile of the student
     """
-
-    columns = sql_adapter.query("SHOW COLUMNS FROM Account;")
-    row = sql_adapter.query(
-        "SELECT * FROM Account WHERE StudentID = %s", (student_id,))
+    query = """
+    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, ci.CourseName
+    FROM Account a
+    JOIN CourseInformation ci ON a.CourseID = ci.CourseID
+    WHERE a.StudentID = %s;
+    """
+    row = sql_adapter.query(query, (student_id,))
+    
     if len(row) == 0:
         response.status_code = status.HTTP_404_NOT_FOUND
-        raise HTTPException(status_code=404, detail="Student not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
 
-    result = dict(zip((column[0] for column in columns), row[0]))
+    result = row[0] if row else {}
 
     return {"message": "Student's data fetched successfully.", "data": result}
-
 
 @router.get("/{student_id}/{club_id}/role")
 async def get_student_role(student_id: int, club_id: int, response: Response):
