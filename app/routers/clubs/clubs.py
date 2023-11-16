@@ -262,3 +262,43 @@ async def delete_club_member(club_id: int,body: dict, response: Response):
         return {"message": "An error occurred.", "error": str(e)}
 
     return {"message": "Member removed from club successfully"}
+
+######## LIKE POST ############
+@router.put("/{update_id}/increaseLike")
+async def increase_update_likes(update_id: str, user_id: str, response: Response):
+    """
+    PUT: increase Like
+    """
+    
+    collection_id = "ClubUpdates"
+    result = firebase_adapter.increment(collection_id,document_id=update_id,field="likes")
+    print(result)
+
+    data = "likedBy:"
+    result2 = firebase_adapter.add_to_array(collection_id, update_id, "likedBy", user_id)
+    print(result2)
+
+    return {
+        "status": 200,
+        "message": "like increased successfully"
+        }
+
+
+######## UNLIKE POST ############
+@router.put("/{update_id}/decreaseLike")
+async def decrease_update_likes(update_id: str, user_id: str, response: Response):
+    """
+    PUT: increase Like
+    """
+    
+    collection_id = "ClubUpdates"
+    result = firebase_adapter.increment(collection_id,document_id=update_id,field="likes",value=-1)
+    print(result)
+
+    data = "likedBy:"
+    result2 = firebase_adapter.remove_from_array(collection_id, update_id, "likedBy", user_id)
+    print(result2)
+    return {
+        "status": 200,
+        "message": "like decreased successfully"
+        }

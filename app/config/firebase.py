@@ -217,3 +217,45 @@ class Firebase:
             # Case 2: Increment a specific document
             doc_ref = collection_ref.document(document_id)
             doc_ref.update({field: firestore.Increment(value)})
+
+    def remove_from_array(self, collection_path, document_id, array_field, item):
+        """
+        Removes an item from an array field in a Firestore document.
+
+        Args:
+            collection_path (str): The path to the Firestore collection.
+            document_id (str): The ID of the specific document to update.
+            array_field (str): The name of the array field in the document.
+            item: The item to be removed from the array field.
+        """
+        try:
+            collection_ref = self.db.collection(collection_path)
+            doc_ref = collection_ref.document(document_id)
+
+            # Firestore operation to remove the item from the array
+            doc_ref.update({array_field: firestore.ArrayRemove([item])})
+            return True
+        except Exception as e:
+            print(f"Error removing item from array: {e}")
+            return False
+
+    def add_to_array(self, collection_path, document_id, array_field, item):
+        """
+        Adds an item to an array field in a Firestore document.
+
+        Args:
+            collection_path (str): The path to the Firestore collection.
+            document_id (str): The ID of the specific document to update.
+            array_field (str): The name of the array field in the document.
+            item: The item to be added to the array field.
+        """
+        try:
+            collection_ref = self.db.collection(collection_path)
+            doc_ref = collection_ref.document(document_id)
+
+            # Firestore operation to add the item to the array
+            doc_ref.update({array_field: firestore.ArrayUnion([item])})
+            return True
+        except Exception as e:
+            print(f"Error adding item to array: {e}")
+            return False
