@@ -24,13 +24,21 @@ class SQLAdapter:
             **os.environ
         }
         try:
-            self.db = mysql.connector.connect(
-                user=config["SQL_USER"],
-                password=config["SQL_PASSWORD"],
-                host=config["SQL_HOST"],
-                database=config["SQL_DATABASE"],
-                port=config["SQL_PORT"]
-            )
+            if "SQL_PORT" in config:
+                self.db = mysql.connector.connect(
+                    user=config["SQL_USER"],
+                    password=config["SQL_PASSWORD"],
+                    host=config["SQL_HOST"],
+                    database=config["SQL_DATABASE"],
+                    port=config["SQL_PORT"]
+                )
+            else:
+                self.db = mysql.connector.connect(
+                    user=config["SQL_USER"],
+                    password=config["SQL_PASSWORD"],
+                    host=config["SQL_HOST"],
+                    database=config["SQL_DATABASE"]
+                )
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print(err)

@@ -1,0 +1,2 @@
+FROM mysql:latest
+LABEL maintainer="Christopher Kok <ForceLightning@noreply.github.com>"
