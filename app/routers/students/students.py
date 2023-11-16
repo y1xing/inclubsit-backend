@@ -113,26 +113,38 @@ async def get_student_clubs(student_id: str, response: Response):
     
     return {"message": "All student's club data fetched successfully", "data": clubs}
 
-@router.get("/{student_id}/profile")
-async def get_student_profile(student_id: int, response: Response):
+@router.get("/student/{student_id}/profile")
+async def get_student_data(student_id: int, response: Response):
     """
-    GET: Get the profile of the student
+    GET: Get a student's data
     """
     query = """
-    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, ci.CourseName
+    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, ci.CourseID, ci.CourseName
     FROM Account a
     JOIN CourseInformation ci ON a.CourseID = ci.CourseID
     WHERE a.StudentID = %s;
     """
-    row = sql_adapter.query(query, (student_id,))
-    
-    if len(row) == 0:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
+    values = (student_id,)
+    try:
+        row = sql_adapter.query(query, values)
+        if row:
+            student_data = row[0]
+            result = {
+                "StudentID": student_data[0],
+                "Email": student_data[1],
+                "FirstName": student_data[2],
+                "LastName": student_data[3],
+                "MatriculationYear": student_data[4],
+                "CourseID": student_data[5],
+                "CourseName": student_data[6],
+            }
+            return {"message": "Student's data fetched successfully.", "data": result}
+        else:
+            raise HTTPException(status_code=404, detail="Student not found.")
+    except Exception as e:
+        response.status_code = 500
+        return {"message": "An error occurred.", "error": str(e)}
 
-    result = row[0] if row else {}
-
-    return {"message": "Student's data fetched successfully.", "data": result}
 
 @router.get("/{student_id}/{club_id}/role")
 async def get_student_role(student_id: int, club_id: int, response: Response):
