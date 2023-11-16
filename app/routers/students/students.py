@@ -113,13 +113,13 @@ async def get_student_clubs(student_id: str, response: Response):
     
     return {"message": "All student's club data fetched successfully", "data": clubs}
 
-@router.get("/{student_id}/profile")
-async def get_student_profile(student_id: int, response: Response):
+@router.get("/student/{student_id}/profile")
+async def get_student_data(student_id: int, response: Response):
     """
-    GET: Get the profile of the student
+    GET: Get a student's data
     """
     query = """
-    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, ci.CourseName
+    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, ci.CourseID, ci.CourseName
     FROM Account a
     JOIN CourseInformation ci ON a.CourseID = ci.CourseID
     WHERE a.StudentID = %s;
