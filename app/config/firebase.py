@@ -9,9 +9,14 @@ import asyncio
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
+CATEGORY_IMAGE_PATH = "CategoryImages"
+CLUBS_IMAGE_PATH = "ClubImages"
+
 
 class Firebase:
     _instance = None
+    _clubs_image_data = None
+    _category_image_data = None
 
     def __init__(self):
         """
@@ -39,6 +44,38 @@ class Firebase:
 
         self.db = firestore.client()
         self.bucket = storage.bucket()
+        self.initialize_images()
+
+    def initialize_images(self):
+        """
+        Fetchs from firestore and stores it in class variable
+        """
+        print("Initialising images")
+        try:
+            club_images_data = self.get(CLUBS_IMAGE_PATH)
+            category_images_data = self.get(CATEGORY_IMAGE_PATH)
+
+            # Reformat it into a dict
+            club_image_dict = {}
+            category_image_dict = {}
+
+            for club_image in club_images_data:
+                club_image_dict[club_image['id']] = club_image
+
+            for category_image in category_images_data:
+                category_image_dict[category_image['id']] = category_image
+
+            self._clubs_image_data = club_image_dict
+            self._category_image_data = category_image_dict
+
+        except Exception as e:
+            print(f"Error initializing data: {e}")
+
+    def get_club_images(self):
+        return self._clubs_image_data
+
+    def get_category_images(self):
+        return self._category_image_data
 
     def __new__(cls):
         if cls._instance is None:
