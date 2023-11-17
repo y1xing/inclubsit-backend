@@ -124,7 +124,7 @@ async def get_student_data(student_id: int, response: Response):
     GET: Get a student's data
     """
     query = """
-    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, a.Gender, ci.CourseID, ci.CourseName
+    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, a.Gender, ci.CourseName
     FROM Account a
     JOIN CourseInformation ci ON a.CourseID = ci.CourseID
     WHERE a.StudentID = %s;
