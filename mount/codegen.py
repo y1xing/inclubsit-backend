@@ -10,15 +10,15 @@ BASE_STUDENT_ID = 2200000
 random.seed(42)
 
 CLUSTER_COURSES = [
-    ("Business, Communication and Design", ["Accountancy", "Air Transport Management",
+    ("BCD - Business, Communication and Design", ["Accountancy", "Air Transport Management",
      "Hospitality Business", "Digital Communications and Integrated Media"]),
-    ("Engineering", ["Aerospace Engineering", "Aircraft Systems Engineering", "Civil Engineering", "Electronics and Data Engineering", "Electrical Power Engineering", "Engineering Systems", "Mechanical Design and Manufacturing Engineering", "Marine Engineering", "Mechatronics Systems", "Mechanical Engineering",
+    ("ENG - Engineering", ["Aerospace Engineering", "Aircraft Systems Engineering", "Civil Engineering", "Electronics and Data Engineering", "Electrical Power Engineering", "Engineering Systems", "Mechanical Design and Manufacturing Engineering", "Marine Engineering", "Mechatronics Systems", "Mechanical Engineering",
      "Naval Architecture and Marine Engineering", "Naval Architecture", "Robotics Systems", "Offshore Engineering", "Sustainable Infrastructure Engineering (Land)", "Sustainable Infrastructure Engineering (Building Services)", "Sustainable Built Environment", "Systems Engineering (ElectroMechanical Systems)"]),
-    ("Food, Chemical and Biotechnology", ["Chemical Engineering (Joint with Newcastle University)",
+    ("FCB - Food, Chemical and Biotechnology", ["Chemical Engineering (Joint with Newcastle University)",
      "Chemical Engineering (Joint with Technical University of Munich)", "Pharmaceutical Engineering", "Food Technology"]),
-    ("Health and Social Sciences", ["Diagnostic Radiotherapy", "Dietetics and Nutrition", "Nursing",
+    ("HSS - Health and Social Sciences", ["Diagnostic Radiotherapy", "Dietetics and Nutrition", "Nursing",
      "Occupational Therapy", "Physiotherapy", "Radiation Therapy", "Speech and Language Therapy"]),
-    ("Infocomm Technology", ["Applied Artificial Intelligence", "Applied Computing", "Computer Engineering", "Computer Science in Interactive Media and Game Development", "Computer Science in Real-Time Interactive Simulation", "Computing Science",
+    ("ICT - Infocomm Technology", ["Applied Artificial Intelligence", "Applied Computing", "Computer Engineering", "Computer Science in Interactive Media and Game Development", "Computer Science in Real-Time Interactive Simulation", "Computing Science",
      "Digital Supply Chain", "Information and Communications Technology (Information Security)", "Information and Communications Technology (Software Engineering)", "Telematics (Intelligent Transportation Systems Engineering)"])
 ]
 

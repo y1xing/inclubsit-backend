@@ -64,19 +64,53 @@ async def get_club_profile(club_id: int, response: Response):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Club not found")
 
+    # Get leaders data also
+    leaders = sql_adapter.query(
+        """
+        SELECT at.TypeName, a.FirstName, a.LastName, a.MatriculationYear, co.CourseName
+        FROM ClubMember c
+        LEFT JOIN Account a ON a.StudentID = c.StudentID
+        LEFT JOIN CourseInformation co ON a.CourseID = co.CourseID
+        INNER JOIN AccountType at ON at.AccountTypeID = c.AccountTypeID
+        WHERE c.ClubID = %s AND c.AccountTypeID > 1
+        """,
+        (club_id,)
+    )
+
+    leaders = [
+        {
+            "role": leader[0],
+            "name": f"{leader[1]} {leader[1]}",
+            "course": leader[4],
+            "year": int(datetime.now().year) - int(leader[3]) + 1,
+
+        } for leader in leaders
+    ]
+
     result = dict(zip(columns, rows[0]))
 
-    return {"message": "club fetched successfully", "data": result}
+    return {"message": "club fetched successfully", "data": {
+        "profile": result,
+        "leaders": leaders
+    }}, 200
 
 
-@router.get("/{club_id}/members")
+@ router.get("/{club_id}/members")
 async def get_club_members(club_id: int, response: Response):
     """
     GET: Get members from a club
     """
 
     rows = sql_adapter.query(
-        "SELECT a.FirstName, a.LastName, at.TypeName, a.MatriculationYear, ci.CourseName FROM Account a RIGHT JOIN ClubMember cm ON a.StudentID = cm.StudentID LEFT JOIN AccountType at ON cm.AccountTypeID = at.AccountTypeID LEFT JOIN CourseInformation ci ON a.CourseID = ci.CourseID WHERE cm.ClubID = %s",
+        """
+        SELECT a.StudentID, a.FirstName, a.LastName, at.TypeName, a.MatriculationYear, a.Gender, ci.CourseName, cl.ClusterName
+        FROM Account a 
+        RIGHT JOIN ClubMember cm ON a.StudentID = cm.StudentID 
+        LEFT JOIN AccountType at ON cm.AccountTypeID = at.AccountTypeID 
+        LEFT JOIN CourseInformation ci ON a.CourseID = ci.CourseID 
+        INNER JOIN Cluster cl ON cl.ClusterID = ci.ClusterID
+        WHERE cm.ClubID = %s
+        """,
         (club_id,)
     )
     if len(rows) == 0:
@@ -85,14 +119,19 @@ async def get_club_members(club_id: int, response: Response):
             status_code=status.HTTP_404_NOT_FOUND, detail="Club not found")
 
     result = [{
-        "first_name": first_name, "last_name": last_name, "role": role,
-        "matriculation_year": matriculation_year, "course_name": course_name
-    } for first_name, last_name, role, matriculation_year, course_name in rows]
+        "studentId": student_id,
+        "name": f"{first_name} {last_name}",
+        "role": role,
+        "year": int(datetime.now().year) - int(matriculation_year) + 1,
+        "gender": gender,
+        "course": course_name,
+        "cluster": cluster,
+    } for student_id, first_name, last_name, role, matriculation_year, gender, course_name, cluster in rows]
 
-    return {"message": "club fetched successfully", "data": result}
+    return {"message": "club fetched successfully", "data": result}, 200
 
 
-@router.get("/{club_id}/updates")
+@ router.get("/{club_id}/updates")
 async def get_club_updates(club_id: str, response: Response):
     """
     GET: Get updates from a club
@@ -105,28 +144,27 @@ async def get_club_updates(club_id: str, response: Response):
 
 
 ######## POST REQUEST ############
-@router.post("/{club_id}/updates")
+@ router.post("/{club_id}/updates")
 async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Response):
     """
     POST: Add a new update for a club
     """
-    
+
     data = dict(body)
-    #set here as all new posts should by default have 0 likes
+    # set here as all new posts should by default have 0 likes
     data["clubID"] = club_id
     data["createdAt"] = datetime.now()
-    #if post is an event add likes and likedBy 
+    # if post is an event add likes and likedBy
     if data["postType"] == "event":
         data["likes"] = 0
         data["likedBy"] = []
-    #if post is an update remove ctaLink
+    # if post is an update remove ctaLink
     elif data["postType"] == "update":
         data.pop("ctaLink")
 
-    result = firebase_adapter.add(CLUB_UPDATE_PATH, data = data)
+    result = firebase_adapter.add(CLUB_UPDATE_PATH, data=data)
 
-
-    return {"message": "update posted successfully"}#, 201
+    return {"message": "update posted successfully"}  # , 201
 
 
 # @router.post("/{club_id}/member", summary="Add Member")
@@ -138,7 +176,7 @@ async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Resp
 
 #     return {"message": "Add member to club successfully"}
 
-@router.post("/{club_id}/member", summary="Add Member")
+@ router.post("/{club_id}/member", summary="Add Member")
 async def add_club_member(club_id: int, body: dict, response: Response):
     """
     POST: Add member to club
@@ -150,7 +188,7 @@ async def add_club_member(club_id: int, body: dict, response: Response):
         raise HTTPException(status_code=400, detail="Missing studentID.")
 
     insert_query = "INSERT INTO ClubMember (ClubID, StudentID, AccountTypeID) VALUES (%s, %s, %s);"
-    values = (club_id, student_id,1)
+    values = (club_id, student_id, 1)
 
     try:
         sql_adapter.query(insert_query, values)
@@ -162,25 +200,25 @@ async def add_club_member(club_id: int, body: dict, response: Response):
 
 
 ######## UPDATE/PUT REQUEST ############
-@router.put("/{club_id}/profile")
+@ router.put("/{club_id}/profile")
 async def update_club_profile(club_id: int, body: ClubProfileSchema, response: Response):
     """
     PUT: Update a club profile
     """
 
-    #if field is empty, do not include it to be updated
+    # if field is empty, do not include it to be updated
     data = dict(body)
-    #tuple to add all parameters to
+    # tuple to add all parameters to
     params = tuple()
 
-    #dynamically create query from body
+    # dynamically create query from body
     query = """
         UPDATE Club SET ClubName = %s, ClubDescription = %s WHERE ClubID = %s;
     """
 
     # #if field is empty, get the current value from the database
     if data["ClubName"] == None or data["ClubName"] == "":
-        #getting the current value from the database
+        # getting the current value from the database
         subquery = "SELECT ClubName FROM Club WHERE ClubID = %s;"
         result = sql_adapter.query(subquery, (club_id,))
         params += (str(result[0][0]),)
@@ -194,7 +232,7 @@ async def update_club_profile(club_id: int, body: ClubProfileSchema, response: R
     else:
         params += (data["ClubDescription"],)
 
-    #if field is empty, get the current value from the database
+    # if field is empty, get the current value from the database
     # for key, value in data.items():
     #     if value == None or value == "":
     #         #getting the current value from the database
@@ -207,31 +245,34 @@ async def update_club_profile(club_id: int, body: ClubProfileSchema, response: R
     params += (club_id,)
 
     try:
-        sql_adapter.query(query, params)   
+        sql_adapter.query(query, params)
     except Exception as e:
         return {"error": str(e)}
 
     return {"message": "club profile updated successfully"}
 
 
-@router.put("/{club_id}/updates")
+@ router.put("/{club_id}/updates")
 async def update_club_updates(document_id: str, body: ClubUpdateSchema, response: Response):
     """
     GET: Add a new update for a club
     """
 
     data = dict(body)
-    #if field is empty, do not include it to be updated
+    # if field is empty, do not include it to be updated
     for item in data:
         if data[item] == None or data[item] == "":
-            data.pop(item)  
+            data.pop(item)
 
-    firebase_adapter.update(CLUB_UPDATE_PATH, document_id=document_id, data=data)
+    firebase_adapter.update(
+        CLUB_UPDATE_PATH, document_id=document_id, data=data)
 
     return {"message": "Update post updated successfully"}
 
-#cdcca201-de7a-4e5c-b305-c01b53b85a6a
+# cdcca201-de7a-4e5c-b305-c01b53b85a6a
 ######## DELETE REQUEST ############
+
+
 @router.delete("/{update_id}/updates")
 async def delete_club_updates(update_id: str, response: Response):
     """
@@ -240,10 +281,10 @@ async def delete_club_updates(update_id: str, response: Response):
     query = firebase_adapter.delete(CLUB_UPDATE_PATH, update_id)
 
     return {"message": "club update deleted successfully"}
-    
+
 
 @router.delete("/clubs/{club_id}/member", summary="Remove Member")
-async def delete_club_member(club_id: int,body: dict, response: Response):
+async def delete_club_member(club_id: int, body: dict, response: Response):
     """
     DELETE: Remove a member from a club
     """
@@ -264,24 +305,28 @@ async def delete_club_member(club_id: int,body: dict, response: Response):
     return {"message": "Member removed from club successfully"}
 
 ######## LIKE POST ############
+
+
 @router.put("/{update_id}/increaseLike")
 async def increase_update_likes(update_id: str, user_id: str, response: Response):
     """
     PUT: increase Like
     """
-    
+
     collection_id = "ClubUpdates"
-    result = firebase_adapter.increment(collection_id,document_id=update_id,field="likes")
+    result = firebase_adapter.increment(
+        collection_id, document_id=update_id, field="likes")
     print(result)
 
     data = "likedBy:"
-    result2 = firebase_adapter.add_to_array(collection_id, update_id, "likedBy", user_id)
+    result2 = firebase_adapter.add_to_array(
+        collection_id, update_id, "likedBy", user_id)
     print(result2)
 
     return {
         "status": 200,
         "message": "like increased successfully"
-        }
+    }
 
 
 ######## UNLIKE POST ############
@@ -290,15 +335,17 @@ async def decrease_update_likes(update_id: str, user_id: str, response: Response
     """
     PUT: increase Like
     """
-    
+
     collection_id = "ClubUpdates"
-    result = firebase_adapter.increment(collection_id,document_id=update_id,field="likes",value=-1)
+    result = firebase_adapter.increment(
+        collection_id, document_id=update_id, field="likes", value=-1)
     print(result)
 
     data = "likedBy:"
-    result2 = firebase_adapter.remove_from_array(collection_id, update_id, "likedBy", user_id)
+    result2 = firebase_adapter.remove_from_array(
+        collection_id, update_id, "likedBy", user_id)
     print(result2)
     return {
         "status": 200,
         "message": "like decreased successfully"
-        }
+    }
