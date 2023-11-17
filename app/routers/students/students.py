@@ -118,13 +118,13 @@ async def get_student_clubs(student_id: str, response: Response):
     return {"message": "All student's club data fetched successfully", "data": clubs}
 
 
-@router.get("/student/{student_id}/profile")
+@router.get("/{student_id}/profile")
 async def get_student_data(student_id: int, response: Response):
     """
     GET: Get a student's data
     """
     query = """
-    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, ci.CourseID, ci.CourseName
+    SELECT a.StudentID, a.Email, a.FirstName, a.LastName, a.MatriculationYear, a.CourseID, a.Gender, ci.CourseID, ci.CourseName
     FROM Account a
     JOIN CourseInformation ci ON a.CourseID = ci.CourseID
     WHERE a.StudentID = %s;
@@ -132,6 +132,8 @@ async def get_student_data(student_id: int, response: Response):
     columns = sql_adapter.query("SHOW COLUMNS FROM Account;")
     columns += sql_adapter.query(
         "SHOW COLUMNS FROM CourseInformation WHERE Field='CourseName';")
+
+    print(columns)
     row = sql_adapter.query(query, (student_id,))
 
     if len(row) == 0:
