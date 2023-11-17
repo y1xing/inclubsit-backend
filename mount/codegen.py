@@ -48,6 +48,7 @@ def main():
     with open('ClubsData - ClubCategoryInformation.csv', 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         club_cat_values = {}
+        club_categories_by_id = []
         for i, row in enumerate(reader):
             for key in row.keys():
                 value = row[key]
@@ -57,6 +58,12 @@ def main():
                     club_cat_values[key].append(value)
                 else:
                     club_cat_values[key] = [value]
+
+        f.seek(0)
+        rows = csv.reader(f)
+        for idx, row in enumerate(rows):
+            if idx > 0:
+                club_categories_by_id.append(row[0])
 
     with open("initialise.sql", "w+", encoding="utf-8") as f:
         # Include initialisation
@@ -78,7 +85,7 @@ def main():
 
         # Insert Club Categories
         print("Inserting Club Categories")
-        for club_category in club_categories:
+        for club_category in club_categories_by_id:
             f.write(
                 f"INSERT INTO ClubCategory (ClubCategoryName) VALUES ('{club_category}');\n")
 
@@ -88,12 +95,13 @@ def main():
             club_email = f'sit_{club_name.replace(" ", "").lower()}@sit.singaporetech.edu.sg'
             club_insta = f'@sit_{club_name.replace(" ", "").lower()}'
             f.write(
-                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations, ClubEmail, ClubInstagram) VALUES ('{club_name}', {club_categories.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}', '{club_email}', '{club_insta}');\n")
+                f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations, ClubEmail, ClubInstagram) VALUES ('{club_name}', {club_categories_by_id.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}', '{club_email}', '{club_insta}');\n")
         f.write('\n')
 
         # Insert club categories info
         print("Inserting Club Categories Information")
-        for idx, (club_cat_id, description) in enumerate(zip(club_cat_values["ClubCategoryID"], club_cat_values['Description'])):
+        for idx, (club_cat, description) in enumerate(zip(club_cat_values["ClubCategory"], club_cat_values['Description'])):
+            club_cat_id = club_categories_by_id.index(club_cat) + 1
             f.write(
                 f"INSERT INTO ClubCategoryInformation (ClubCategoryID, CategoryDescription) VALUES ({club_cat_id}, '{description}');\n"
             )
