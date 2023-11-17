@@ -26,10 +26,10 @@ CLUSTER_COURSES = [
 def main():
     initialise = None
 
-    cred = credentials.Certificate("key.json")
-    app = firebase_admin.initialize_app(cred, {
-        'storageBucket': 'inclubsit.appspot.com'
-    })
+    # cred = credentials.Certificate("key.json")
+    # app = firebase_admin.initialize_app(cred, {
+    #     'storageBucket': 'inclubsit.appspot.com'
+    # })
 
     with open('template.sql', 'r', encoding='utf-8') as f:
         initialise = f.read()
@@ -115,8 +115,9 @@ def main():
             student_id = BASE_STUDENT_ID + i
             email = f'{student_id}@sit.singaporetech.edu.sg'
             course_id = courses.index(random.choice(courses)) + 1
+            gender = random.choice(['male', 'female'])
             f.write(
-                f"INSERT INTO Account (StudentID, Email, FirstName, LastName, MatriculationYear, CourseID) VALUES ({student_id}, '{email}', '{student.split()[0]}', '{student.split()[1]}', 2022, '{course_id}');\n")
+                f"INSERT INTO Account (StudentID, Email, FirstName, LastName, MatriculationYear, CourseID, Gender) VALUES ({student_id}, '{email}', '{student.split()[0]}', '{student.split()[1]}', 2022, '{course_id}', '{gender}');\n")
             # ! UNCOMMENT TO CREATE USERS IN FIREBASE
             # authenticate_user(email, str(student_id))
         f.write('\n')
