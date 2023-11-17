@@ -54,12 +54,21 @@ async def get_club_profile(club_id: int, response: Response):
     """
     GET: Fetch a single club
     """
+    images = firebase_adapter.get_club_images()
+
     columns = sql_adapter.query("SHOW COLUMNS FROM Club;")
     columns = [column[0] for column in columns]
     rows = sql_adapter.query(
         "SELECT c.ClubID, c.ClubName, cc.ClubCategoryName, c.ClubDescription, c.ClubTrainingDates, c.ClubTrainingLocations, c.ClubEmail, c.ClubInstagram FROM Club c LEFT JOIN ClubCategory cc ON c.ClubCategoryID = cc.ClubCategoryID WHERE c.ClubID = %s", (
             club_id, )
     )
+
+    columns.append("logo")
+    columns.append("cover")
+
+    rows = [row + (images[str(row[0])]['logo'], images[str(row[0])]['cover'])
+            for row in rows]
+
     if len(rows) == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Club not found")
@@ -140,7 +149,7 @@ async def get_club_updates(club_id: str, response: Response):
 
     result = firebase_adapter.get(CLUB_UPDATE_PATH, query=query)
 
-    return {"message": "club fetched successfully", "data": result}
+    return {"message": "club fetched successfully", "data": result}, 200
 
 
 ######## POST REQUEST ############
