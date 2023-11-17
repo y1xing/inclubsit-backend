@@ -74,21 +74,22 @@ async def get_category(category_id: str, response: Response):
 
     try:
         clubs = sql_adapter.query(
-            "SELECT * FROM Club WHERE ClubCategoryID = %s", (category_id, ))
+            "SELECT c.ClubID, c.ClubName, COUNT(*), c.ClubTrainingDates, c.ClubTrainingLocations FROM Club c LEFT JOIN ClubMember cm on c.ClubID = cm.ClubID WHERE c.ClubCategoryID = %s GROUP BY cm.ClubID", (category_id, ))
         category_info = sql_adapter.query(
-            "SELECT * FROM ClubCategoryInformation WHERE ClubCategoryID = %s", (category_id, ))[0]
+            "SELECT c.ClubCategoryName, cc.CategoryDescription FROM ClubCategoryInformation cc, ClubCategory c WHERE c.ClubCategoryID = %s", (category_id, ))[0]
 
         result_formmated = {
             "category_info": {
-                "title": category_info[1],
+                "name": category_info[0],
+                "description": category_info[1],
             },
             "clubs": [
                 {
                     "id": club[0],
                     "title": club[1],
-                    "members": "1-10",
-                    "training": "Every Friday, 6pm to 8pm",
-                    "location": "Dover Campus",
+                    "members": club[2],
+                    "training": club[3],
+                    "location": club[4],
                 } for club in clubs]
         }
 
