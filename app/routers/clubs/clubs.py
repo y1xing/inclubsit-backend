@@ -149,7 +149,10 @@ async def get_club_updates(club_id: str, response: Response):
 
     result = firebase_adapter.get(CLUB_UPDATE_PATH, query=query)
 
-    return {"message": "club fetched successfully", "data": result}, 200
+    # Sort result by createdAt, earliest to oldest
+    sorted_posts = sorted(result, key=lambda x: x['createdAt'], reverse=True)
+
+    return {"message": "club fetched successfully", "data": sorted_posts}, 200
 
 
 ######## POST REQUEST ############
@@ -171,7 +174,11 @@ async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Resp
     elif data["postType"] == "update":
         data.pop("ctaLink")
 
-    result = firebase_adapter.add(CLUB_UPDATE_PATH, data=data)
+    elif data['media'] == None:
+        data.pop("media")
+
+    result = firebase_adapter.add(
+        CLUB_UPDATE_PATH, data=data, document_id=data['id'])
 
     return {"message": "update posted successfully"}  # , 201
 
@@ -222,36 +229,16 @@ async def update_club_profile(club_id: int, body: ClubProfileSchema, response: R
 
     # dynamically create query from body
     query = """
-        UPDATE Club SET ClubName = %s, ClubDescription = %s WHERE ClubID = %s;
+        UPDATE Club SET ClubDescription = %s, ClubTrainingDates = %s, ClubTrainingLocations = %s, ClubEmail = %s, ClubInstagram = %s WHERE ClubID = %s;
     """
 
-    # #if field is empty, get the current value from the database
-    if data["ClubName"] == None or data["ClubName"] == "":
-        # getting the current value from the database
-        subquery = "SELECT ClubName FROM Club WHERE ClubID = %s;"
-        result = sql_adapter.query(subquery, (club_id,))
-        params += (str(result[0][0]),)
-    else:
-        params += (data["ClubName"],)
+    email = data['email']
+    description = data['description']
+    instagram = data['instagram']
+    location = data['location']
+    training = data['training']
 
-    if data["ClubDescription"] == None or data["ClubDescription"] == "":
-        subquery = "SELECT ClubDescription FROM Club WHERE ClubID = %s;"
-        result = sql_adapter.query(subquery, (club_id,))
-        params += (str(result[0][0]),)
-    else:
-        params += (data["ClubDescription"],)
-
-    # if field is empty, get the current value from the database
-    # for key, value in data.items():
-    #     if value == None or value == "":
-    #         #getting the current value from the database
-    #         subquery = "SELECT %s FROM Club WHERE ClubID = %s;"
-    #         result = sql_adapter.query(subquery, (str(key).strip("'\""), club_id,))
-    #         params += (str(result[0]),)
-    #     else:
-    #         params += (value,)
-
-    params += (club_id,)
+    params = (description, training, location, email, instagram, club_id)
 
     try:
         sql_adapter.query(query, params)
@@ -261,8 +248,8 @@ async def update_club_profile(club_id: int, body: ClubProfileSchema, response: R
     return {"message": "club profile updated successfully"}
 
 
-@ router.put("/{club_id}/updates")
-async def update_club_updates(document_id: str, body: ClubUpdateSchema, response: Response):
+@ router.put("/{post_id}/updates")
+async def update_club_updates(post_id: str, body: ClubUpdateSchema, response: Response):
     """
     GET: Add a new update for a club
     """
@@ -274,7 +261,7 @@ async def update_club_updates(document_id: str, body: ClubUpdateSchema, response
             data.pop(item)
 
     firebase_adapter.update(
-        CLUB_UPDATE_PATH, document_id=document_id, data=data)
+        CLUB_UPDATE_PATH, document_id=post_id, data=data)
 
     return {"message": "Update post updated successfully"}
 
