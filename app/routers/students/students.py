@@ -66,6 +66,10 @@ async def get_student_updates(student_id: str, response: Response):
                 # Query based on 'clubid' field in Firestore documents
                 query=[("clubID", "==", club[0])]
             )
+            name = sql_adapter.query(
+                "SELECT ClubName FROM Club WHERE ClubID = %s", (club[0],))
+            for i in range(len(club_updates)):
+                club_updates[i]["clubName"] = name[0][0]
             if club_updates:
                 updates_list.extend(club_updates)
 
@@ -100,8 +104,11 @@ async def get_student_recommended(student_id: str, response: Response):
     else:
         category = counts[0][0]
 
-    result = sql_adapter.query(
-        "SELECT ClubName, ClubID FROM club WHERE ClubCategoryID = %s ORDER BY RAND() LIMIT 5", (category,))
+    clubs = sql_adapter.query(
+        "SELECT C.ClubID, C.ClubName, CC.ClubCategoryName FROM club AS C, ClubCategory AS CC WHERE C.ClubCategoryID = %s AND C.ClubCategoryID = CC.ClubCategoryID ORDER BY RAND() LIMIT 5", (category,))
+    
+    images = firebase_adapter.get_club_images()
+    result = [club + (images[str(club[0])]['logo'],) for club in clubs]
 
     return {"message": "All students data fetched successfully", "data": result}
 
@@ -113,9 +120,11 @@ async def get_student_clubs(student_id: str, response: Response):
     """
     # Get the clubs that a user is member of with SQL based on user_id
     clubs = sql_adapter.query(
-        "SELECT c.ClubName, c.ClubID FROM Club c INNER JOIN ClubMember cm ON c.ClubID = cm.ClubID WHERE cm.StudentID = %s",  (student_id,))
+        "SELECT c.ClubID, c.ClubName, c.ClubDescription  FROM Club c INNER JOIN ClubMember cm ON c.ClubID = cm.ClubID WHERE cm.StudentID = %s",  (student_id,))
 
-    return {"message": "All student's club data fetched successfully", "data": clubs}
+    images = firebase_adapter.get_club_images()
+    result = [club + (images[str(club[0])]['logo'],) for club in clubs]
+    return {"message": "All student's club data fetched successfully", "data": result}
 
 
 @router.get("/{student_id}/profile")
