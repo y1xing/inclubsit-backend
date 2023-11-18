@@ -4,13 +4,17 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import storage
 import asyncio
+import json
+import os
 
 
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
-CATEGORY_IMAGE_PATH = "CategoryImages"
-CLUBS_IMAGE_PATH = "ClubImages"
+current_directory = os.path.dirname(os.path.abspath(__file__))
+CATEGORY_IMAGE_FILE_PATH = os.path.join(
+    current_directory, "category_images.json")
+CLUBS_IMAGE_FILE_PATH = os.path.join(current_directory, "club_images.json")
 
 
 class Firebase:
@@ -52,21 +56,16 @@ class Firebase:
         """
         print("Initialising images")
         try:
-            club_images_data = self.get(CLUBS_IMAGE_PATH)
-            category_images_data = self.get(CATEGORY_IMAGE_PATH)
+            # Get images data from json file
+            with open(CLUBS_IMAGE_FILE_PATH, "r") as club_image_file:
+                club_images_data = json.load(club_image_file)
+                self._clubs_image_data = club_images_data
 
-            # Reformat it into a dict
-            club_image_dict = {}
-            category_image_dict = {}
+            with open(CATEGORY_IMAGE_FILE_PATH, 'r') as category_image_file:
+                category_images_data = json.load(category_image_file)
+                self._category_image_data = category_images_data
 
-            for club_image in club_images_data:
-                club_image_dict[club_image['id']] = club_image
-
-            for category_image in category_images_data:
-                category_image_dict[category_image['id']] = category_image
-
-            self._clubs_image_data = club_image_dict
-            self._category_image_data = category_image_dict
+            print("Initialising Images successful")
 
         except Exception as e:
             print(f"Error initializing data: {e}")
@@ -101,7 +100,7 @@ class Firebase:
         Returns:
             dict or list: The fetched data as a dictionary (for single document) or a list of dictionaries (for multiple documents).
 
-        Raises:
+        Raises: 
             Exception: If an error occurs during database access.
         """
         try:

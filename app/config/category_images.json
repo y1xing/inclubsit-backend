@@ -1,0 +1,30 @@
+{
+    "1": {
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_Student%20Chapters.jpeg?alt=media&token=e388a54c-aa19-431c-b95b-b76961e64473",
+        "id": "1"
+    },
+    "2": {
+        "id": "2",
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_Special%20Interests.jpeg?alt=media&token=c18dff03-3a21-4966-b58d-1771f3f8fe49"
+    },
+    "3": {
+        "id": "3",
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_Leadership.jpeg?alt=media&token=b831d860-1709-4426-acaa-ea69a0f60ea2"
+    },
+    "4": {
+        "id": "4",
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_PA.jpeg?alt=media&token=26fde256-158a-4091-8303-287c349c74e2"
+    },
+    "5": {
+        "id": "5",
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_Sports.jpeg?alt=media&token=88447ce1-62e2-4e3c-bac3-d8bbf0a66343"
+    },
+    "6": {
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_GC.jpeg?alt=media&token=4c847e9c-4720-46ce-b227-42409d237ccf",
+        "id": "6"
+    },
+    "7": {
+        "id": "7",
+        "image": "https://firebasestorage.googleapis.com/v0/b/inclubsit.appspot.com/o/CategoryAssets%2FProgrammes_SMC1.jpeg?alt=media&token=cc690423-40b7-4ca5-aa19-35da96a96e29"
+    }
+}

@@ -345,3 +345,14 @@ async def decrease_update_likes(update_id: str, user_id: str, response: Response
         "status": 200,
         "message": "like decreased successfully"
     }
+
+
+@router.get("/test-images")
+async def get_images(response: Response):
+    club_images = firebase_adapter.get_club_images()
+    category_images = firebase_adapter.get_category_images()
+
+    return {
+        'clubImages': club_images,
+        'categoryImages': category_images
+    }
