@@ -180,7 +180,7 @@ async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Resp
     result = firebase_adapter.add(
         CLUB_UPDATE_PATH, data=data, document_id=data['id'])
 
-    return {"message": "update posted successfully"}  # , 201
+    return {"message": "update posted successfully", "data": data}  # , 201
 
 
 # @router.post("/{club_id}/member", summary="Add Member")
@@ -263,7 +263,7 @@ async def update_club_updates(post_id: str, body: ClubUpdateSchema, response: Re
     firebase_adapter.update(
         CLUB_UPDATE_PATH, document_id=post_id, data=data)
 
-    return {"message": "Update post updated successfully"}
+    return {"message": "Update post updated successfully", "data": data}
 
 # cdcca201-de7a-4e5c-b305-c01b53b85a6a
 ######## DELETE REQUEST ############
@@ -279,12 +279,11 @@ async def delete_club_updates(update_id: str, response: Response):
     return {"message": "club update deleted successfully"}
 
 
-@router.delete("/clubs/{club_id}/member", summary="Remove Member")
-async def delete_club_member(club_id: int, body: dict, response: Response):
+@router.delete("/{club_id}/member/{student_id}", summary="Remove Member")
+async def delete_club_member(club_id: int, student_id: str, response: Response):
     """
     DELETE: Remove a member from a club
     """
-    student_id = body.get("StudentID")
 
     if not student_id:
         raise HTTPException(status_code=400, detail="Missing studentID.")
