@@ -66,10 +66,14 @@ async def get_student_updates(student_id: str, response: Response):
                 # Query based on 'clubid' field in Firestore documents
                 query=[("clubID", "==", club[0])]
             )
+
             name = sql_adapter.query(
                 "SELECT ClubName FROM Club WHERE ClubID = %s", (club[0],))
+            images = firebase_adapter.get_club_images()
+            image = images[str(club[0])]['logo']
             for i in range(len(club_updates)):
                 club_updates[i]["clubName"] = name[0][0]
+                club_updates[i]["logo"] = image
             if club_updates:
                 updates_list.extend(club_updates)
 
@@ -98,15 +102,19 @@ async def get_student_recommended(student_id: str, response: Response):
                                 DESC LIMIT 1", (student_id,))
     print(counts)
     # If the student is not part of any club, recommend random clubs
-    # 1 = SMC, therefore suggest a random club from other categories
+    # 7 = SMC, therefore suggest a random club from other categories
     if counts[0][0] == 1:
         category = rand.randint(2, 7)
     else:
         category = counts[0][0]
 
-    clubs = sql_adapter.query(
-        "SELECT C.ClubID, C.ClubName, CC.ClubCategoryName FROM club AS C, ClubCategory AS CC WHERE C.ClubCategoryID = %s AND C.ClubCategoryID = CC.ClubCategoryID ORDER BY RAND() LIMIT 5", (category,))
-    
+    clubs = sql_adapter.query("SELECT C.ClubID, C.ClubName, CC.ClubCategoryName \
+        FROM club AS C \
+        JOIN ClubCategory AS CC ON C.ClubCategoryID = CC.ClubCategoryID \
+        WHERE C.ClubCategoryID = %s \
+        AND C.ClubCategoryID = CC.ClubCategoryID \
+        AND C.ClubID NOT IN (SELECT ClubID FROM ClubMember WHERE StudentID = %s) \
+        ORDER BY RAND() LIMIT 5", (category, student_id,))    
     images = firebase_adapter.get_club_images()
     result = [club + (images[str(club[0])]['logo'],) for club in clubs]
 
