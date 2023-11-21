@@ -109,7 +109,7 @@ async def get_student_recommended(student_id: str, response: Response):
         category = counts[0][0]
 
     clubs = sql_adapter.query("SELECT C.ClubID, C.ClubName, CC.ClubCategoryName \
-        FROM club AS C \
+        FROM Club AS C \
         JOIN ClubCategory AS CC ON C.ClubCategoryID = CC.ClubCategoryID \
         WHERE C.ClubCategoryID = %s \
         AND C.ClubCategoryID = CC.ClubCategoryID \
