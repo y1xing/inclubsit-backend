@@ -90,7 +90,7 @@ async def get_student_updates(student_id: str, response: Response):
 @router.get("/{student_id}/recommended")
 async def get_student_recommended(student_id: str, response: Response):
     """
-    GET: Get the recommendec clubs for a student
+    GET: Get the recommended clubs for a student
     """
 
     counts = sql_adapter.query("SELECT C.ClubCategoryID \
