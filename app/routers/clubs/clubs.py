@@ -249,7 +249,7 @@ async def update_club_profile(club_id: int, body: ClubProfileSchema, response: R
 
 
 @ router.put("/{post_id}/updates")
-async def update_club_updates(post_id: str, body: ClubUpdateSchema, response: Response):
+async def update_club_updates(post_id: str, body: dict, response: Response):
     """
     GET: Add a new update for a club
     """
