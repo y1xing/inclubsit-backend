@@ -8,9 +8,6 @@ import json
 import os
 
 
-import firebase_admin
-from firebase_admin import credentials, firestore, storage
-
 current_directory = os.path.dirname(os.path.abspath(__file__))
 CATEGORY_IMAGE_FILE_PATH = os.path.join(
     current_directory, "category_images.json")
@@ -75,6 +72,9 @@ class Firebase:
 
     def get_category_images(self):
         return self._category_image_data
+
+    def get_current_timestamp(self):
+        return firestore.SERVER_TIMESTAMP
 
     def __new__(cls):
         if cls._instance is None:

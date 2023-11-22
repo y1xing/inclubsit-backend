@@ -165,7 +165,7 @@ async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Resp
     data = dict(body)
     # set here as all new posts should by default have 0 likes
     data["clubID"] = club_id
-    data["createdAt"] = datetime.now()
+    data["createdAt"] = datetime.utcnow()
     # if post is an event add likes and likedBy
     if data["postType"] == "event":
         data["likes"] = 0
@@ -177,8 +177,12 @@ async def post_club_updates(club_id: int, body: ClubUpdateSchema, response: Resp
     elif data['media'] == None:
         data.pop("media")
 
+    print(data)
+
     result = firebase_adapter.add(
         CLUB_UPDATE_PATH, data=data, document_id=data['id'])
+
+    data['createdAt'] = datetime.now()
 
     return {"message": "update posted successfully", "data": data}  # , 201
 
