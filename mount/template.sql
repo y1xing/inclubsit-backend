@@ -30,7 +30,11 @@ CREATE TABLE IF NOT EXISTS Account (
     LastName VARCHAR(127) NOT NULL,
     MatriculationYear INT NOT NULL,
     CourseID INT NOT NULL,
-    PRIMARY KEY (StudentID)
+    Gender VARCHAR(127) NOT NULL,
+    PRIMARY KEY (StudentID),
+    FOREIGN KEY (CourseID)
+        REFERENCES CourseInformation(CourseID)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS AccountType (
