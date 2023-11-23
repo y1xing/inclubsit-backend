@@ -4,7 +4,6 @@ import os
 import uvicorn
 
 # Import the different routers like /user /clubs
-from routers.example import example
 from routers.clubs import clubs
 from routers.students import students
 from routers.categories import categories
@@ -24,7 +23,6 @@ os.chdir(dname)
 app = FastAPI(title="InClubSIT Backend", version="0.5")
 
 # Include the different routers
-app.include_router(example.router)
 app.include_router(students.router)
 app.include_router(clubs.router)
 app.include_router(categories.router)

@@ -359,3 +359,23 @@ async def get_images(response: Response):
         'clubImages': club_images,
         'categoryImages': category_images
     }
+
+
+@router.get("/search/{club_name}")
+async def get_club_id(club_name: str):
+    query = """
+        SELECT ClubID FROM Club WHERE ClubName LIKE %s
+    """
+
+    result = sql_adapter.query(query, ('%' + club_name + '%',))
+
+    # Check if result exists
+    if result:
+        return {
+            "message": "Successfully updated",
+            "club_id": result[0][0]
+        }
+    else:
+        return {
+            "message": "Club not found"
+        }
