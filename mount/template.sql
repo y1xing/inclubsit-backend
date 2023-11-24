@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS AccountType (
 CREATE TABLE IF NOT EXISTS ClubCategory (
     ClubCategoryID INT NOT NULL AUTO_INCREMENT,
     ClubCategoryName VARCHAR(127) NOT NULL UNIQUE,
+    CategoryDescription LONGTEXT NOT NULL,
     PRIMARY KEY (ClubCategoryID)
 );
 
@@ -59,14 +60,6 @@ CREATE TABLE IF NOT EXISTS Club (
     ClubEmail VARCHAR(127) NOT NULL UNIQUE,
     ClubInstagram VARCHAR(127) NOT NULL UNIQUE,
     PRIMARY KEY (ClubID),
-    FOREIGN KEY (ClubCategoryID)
-        REFERENCES ClubCategory(ClubCategoryID)
-);
-
-CREATE TABLE IF NOT EXISTS ClubCategoryInformation (
-    ClubCategoryID INT NOT NULL,
-    CategoryDescription LONGTEXT NOT NULL,
-    PRIMARY KEY (ClubCategoryID),
     FOREIGN KEY (ClubCategoryID)
         REFERENCES ClubCategory(ClubCategoryID)
 );
@@ -88,18 +81,6 @@ CREATE TABLE IF NOT EXISTS ClubMember (
     UNIQUE (ClubID, StudentID)
 );
 
--- CREATE TABLE IF NOT EXISTS Interest (
---     InterestID INT NOT NULL AUTO_INCREMENT,
---     AccountID INT NOT NULL,
---     ClubID INT NOT NULL,
---     PRIMARY KEY (InterestID),
---     FOREIGN KEY (AccountID)
---         REFERENCES Account(AccountID)
---         ON DELETE CASCADE,
---     FOREIGN KEY (ClubID)
---         REFERENCES Club(ClubID)
---         ON DELETE CASCADE
--- );
 
 -- Dummy Data
 
