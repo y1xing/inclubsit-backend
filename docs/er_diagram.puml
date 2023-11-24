@@ -25,6 +25,7 @@ table(Account) {
     column(LastName): VARCHAR(127)
     column(MatriculationYear): INT
     foreign_key(CourseID): INT
+    column(Gender): VARCHAR(127)
 }
 
 table(AccountType) {
@@ -37,6 +38,7 @@ table(ClubCategory) {
     primary_key(ClubCategoryID): INT
     --
     column(ClubCategoryName): VARCHAR(127)
+    column(CategoryDescription): LONGTEXT
 }
 
 table(Club) {
@@ -51,12 +53,6 @@ table(Club) {
     column(ClubInstagram): VARCHAR(127)
 }
 
-table(ClubCategoryInformation){
-    primary_key(ClubCategoryID): INT
-    --
-    column(CategoryDescription): LONGTEXT
-}
-
 table(ClubMember) {
     primary_key(ClubMemberID): INT
     --
@@ -68,7 +64,6 @@ table(ClubMember) {
 CourseInformation }o--|| Cluster: FK[ClusterID]
 Account }|--|| CourseInformation: FK[CourseID]
 Club }o--|| ClubCategory: FK[ClubCategoryID]
-ClubCategoryInformation ||--|| ClubCategory: FK[ClubCategoryID]
 ClubMember }o--|{ Club: FK[ClubID]
 ClubMember }|--|| Account: FK[StudentID]
 ClubMember }o--|{ AccountType: FK[AccountTypeID]
