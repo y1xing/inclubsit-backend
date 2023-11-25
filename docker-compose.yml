@@ -1,7 +1,31 @@
 version: "3.4"
 services:
+    mysql:
+        container_name: InClubSIT-mysql
+        image: mysql:latest
+        build:
+            context: .
+            dockerfile: ./Dockerfile.data
+        ports:
+            - 32769:3306
+        volumes:
+            - ./mount/initialise.sql:/docker-entrypoint-initdb.d/0_init.sql
+        environment:
+            MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+            MYSQL_DATABASE: InClubSIT
+            MYSQL_USER: app
+            MYSQL_PASSWORD: secret
+        healthcheck:
+            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+            interval: 30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
     app:
         container_name: InClubSIT-app
+        depends_on:
+            mysql:
+                condition: service_healthy
         build:
             context: .
             dockerfile: ./Dockerfile.app
@@ -20,27 +44,9 @@ services:
             - 8001:80
         links:
             - mysql:mysql
-        depends_on:
-            - mysql
         restart: always
         volumes:
             - ./app:/code/app
-    mysql:
-        container_name: InClubSIT-mysql
-        image: mysql:latest
-        build:
-            context: .
-            dockerfile: ./Dockerfile.data
-        ports:
-            - 32769:3306
-        volumes:
-            - ./mount/initialise.sql:/docker-entrypoint-initdb.d/0_init.sql
-        environment:
-            MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-            MYSQL_DATABASE: InClubSIT
-            MYSQL_USER: app
-            MYSQL_PASSWORD: secret
-
 
 
 volumes:

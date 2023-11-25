@@ -1,0 +1,71 @@
+@startuml er_diagram
+!define primary_key(x) <b><color:#b8861b><&key></color> x</b>
+!define foreign_key(x) <color:#aaaaaa><&key></color> x
+!define column(x) <color:#7f7f7f><&media-record></color> x
+!define table(x) entity x << (T, white) >>
+
+table(Cluster) {
+    primary_key(ClusterID): INT
+    --
+    column(ClusterName): VARCHAR(127)
+}
+
+table(CourseInformation) {
+    primary_key(CourseID): INT
+    --
+    column(CourseName): VARCHAR(127)
+    foreign_key(ClusterID): INT
+}
+
+table(Account) {
+    primary_key(StudentID): INT
+    --
+    column(Email): VARCHAR(127)
+    column(FirstName): VARCHAR(127)
+    column(LastName): VARCHAR(127)
+    column(MatriculationYear): INT
+    foreign_key(CourseID): INT
+    column(Gender): VARCHAR(127)
+}
+
+table(AccountType) {
+    primary_key(AccountTypeID): INT
+    --
+    column(TypeName): VARCHAR(127)
+}
+
+table(ClubCategory) {
+    primary_key(ClubCategoryID): INT
+    --
+    column(ClubCategoryName): VARCHAR(127)
+    column(CategoryDescription): LONGTEXT
+}
+
+table(Club) {
+    primary_key(ClubID): INT
+    --
+    column(ClubName): VARCHAR(127)
+    foreign_key(ClubCategoryID): INT
+    column(ClubDescription): LONGTEXT
+    column(ClubTrainingDates): VARCHAR(127)
+    column(ClubTrainingLocations): VARCHAR(127)
+    column(ClubEmail): VARCHAR(127)
+    column(ClubInstagram): VARCHAR(127)
+}
+
+table(ClubMember) {
+    primary_key(ClubMemberID): INT
+    --
+    foreign_key(ClubID): INT
+    foreign_key(StudentID): INT
+    foreign_key(AccountTypeID): INT
+}
+
+CourseInformation }o--|| Cluster: FK[ClusterID]
+Account }|--|| CourseInformation: FK[CourseID]
+Club }o--|| ClubCategory: FK[ClubCategoryID]
+ClubMember }o--|{ Club: FK[ClubID]
+ClubMember }|--|| Account: FK[StudentID]
+ClubMember }o--|{ AccountType: FK[AccountTypeID]
+
+@enduml

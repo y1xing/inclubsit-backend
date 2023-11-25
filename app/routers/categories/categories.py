@@ -84,9 +84,9 @@ async def get_category(category_id: str, response: Response):
     try:
         print("Category_id", category_id)
         clubs = sql_adapter.query(
-            "SELECT c.ClubID, c.ClubName, COUNT(*), c.ClubTrainingDates, c.ClubTrainingLocations FROM Club c LEFT JOIN ClubMember cm on c.ClubID = cm.ClubID WHERE c.ClubCategoryID = %s GROUP BY cm.ClubID", (category_id, ))
+            "SELECT c.ClubID, c.ClubName, COUNT(*), c.ClubTrainingDates, c.ClubTrainingLocations FROM Club c LEFT JOIN ClubMember cm on c.ClubID = cm.ClubID WHERE c.ClubCategoryID = %s GROUP BY c.ClubID", (category_id, ))
         category_info = sql_adapter.query(
-            "SELECT c.ClubCategoryName, cc.CategoryDescription FROM ClubCategory c LEFT JOIN ClubCategoryInformation cc on c.ClubCategoryID = cc.ClubCategoryID WHERE cc.ClubCategoryID = %s", (category_id, ))[0]
+            "SELECT ClubCategoryName, CategoryDescription FROM ClubCategory WHERE ClubCategoryID = %s", (category_id, ))[0]
 
         print('category_info', category_info)
 

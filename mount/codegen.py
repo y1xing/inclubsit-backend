@@ -26,6 +26,7 @@ CLUSTER_COURSES = [
 def main():
     initialise = None
 
+    # ! UNCOMMENT TO CREATE USERS IN FIREBASE
     # cred = credentials.Certificate("key.json")
     # app = firebase_admin.initialize_app(cred, {
     #     'storageBucket': 'inclubsit.appspot.com'
@@ -83,11 +84,12 @@ def main():
                 f.write(
                     f"INSERT INTO CourseInformation (CourseName, ClusterID) VALUES ('{course}', {cluster_id + 1});\n")
 
-        # Insert Club Categories
-        print("Inserting Club Categories")
-        for club_category in club_categories_by_id:
+        # Insert club categories info
+        print("Inserting Club Categories Information")
+        for idx, (club_cat, description) in enumerate(zip(club_cat_values["ClubCategory"], club_cat_values['Description'])):
             f.write(
-                f"INSERT INTO ClubCategory (ClubCategoryName) VALUES ('{club_category}');\n")
+                f"INSERT INTO ClubCategory (ClubCategoryName, CategoryDescription) VALUES ('{club_cat}', '{description}');\n"
+            )
 
         # Insert clubs
         print("Inserting Clubs")
@@ -97,14 +99,6 @@ def main():
             f.write(
                 f"INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription, ClubTrainingDates, ClubTrainingLocations, ClubEmail, ClubInstagram) VALUES ('{club_name}', {club_categories_by_id.index(values['Club_Category'][idx]) + 1}, '{description}', '{train_dates}', '{train_loc}', '{club_email}', '{club_insta}');\n")
         f.write('\n')
-
-        # Insert club categories info
-        print("Inserting Club Categories Information")
-        for idx, (club_cat, description) in enumerate(zip(club_cat_values["ClubCategory"], club_cat_values['Description'])):
-            club_cat_id = club_categories_by_id.index(club_cat) + 1
-            f.write(
-                f"INSERT INTO ClubCategoryInformation (ClubCategoryID, CategoryDescription) VALUES ({club_cat_id}, '{description}');\n"
-            )
 
         # Insert students
         print("Inserting Students")
@@ -146,8 +140,10 @@ def generate_names():
     LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis', 'Miller',
                   'Wilson', 'Moore', 'Lee', 'Tan', 'Zhang', 'Wong', 'Ho', 'Chen', 'Liu',
                   'Yang', 'Huang', 'Zhao', 'Wu']
+    first_name = random.choice(FIRST_NAMES)
+    last_name = random.choice(LAST_NAMES)
 
-    return random.choice(FIRST_NAMES) + ' ' + random.choice(LAST_NAMES)
+    return f"{first_name} {last_name}"
 
 
 def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20, num_clubs_per_student=5, student_leader_pct=0.1, min_leaders=3):
@@ -157,6 +153,7 @@ def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20,
     while len(students) < num_students:
         students.append(generate_names())
         students = list(set(students))
+        students.sort()
     student_club_pairs = {club_name: [] for club_name in club_names}
     for i, student in enumerate(students):
         clubs = random.sample(club_names, k=num_clubs_per_student)
