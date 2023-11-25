@@ -86,6 +86,7 @@ async def get_club_profile(club_id: int, response: Response):
         (club_id,)
     )
 
+    # Add to leader list
     leaders = [
         {
             "role": leader[0],
