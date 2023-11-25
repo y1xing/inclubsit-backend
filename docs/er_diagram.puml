@@ -64,8 +64,8 @@ table(ClubMember) {
 CourseInformation }o--|| Cluster: FK[ClusterID]
 Account }|--|| CourseInformation: FK[CourseID]
 Club }o--|| ClubCategory: FK[ClubCategoryID]
-ClubMember }o--|{ Club: FK[ClubID]
+ClubMember }o--|| Club: FK[ClubID]
 ClubMember }|--|| Account: FK[StudentID]
-ClubMember }o--|{ AccountType: FK[AccountTypeID]
+ClubMember }o--|| AccountType: FK[AccountTypeID]
 
 @enduml
