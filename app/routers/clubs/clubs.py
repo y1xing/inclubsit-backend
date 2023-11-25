@@ -89,7 +89,7 @@ async def get_club_profile(club_id: int, response: Response):
     leaders = [
         {
             "role": leader[0],
-            "name": f"{leader[1]} {leader[1]}",
+            "name": f"{leader[1]} {leader[2]}",
             "course": leader[4],
             "year": int(datetime.now().year) - int(leader[3]) + 1,
 
