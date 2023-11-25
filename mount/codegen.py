@@ -140,8 +140,10 @@ def generate_names():
     LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis', 'Miller',
                   'Wilson', 'Moore', 'Lee', 'Tan', 'Zhang', 'Wong', 'Ho', 'Chen', 'Liu',
                   'Yang', 'Huang', 'Zhao', 'Wu']
+    first_name = random.choice(FIRST_NAMES)
+    last_name = random.choice(LAST_NAMES)
 
-    return random.choice(FIRST_NAMES) + ' ' + random.choice(LAST_NAMES)
+    return f"{first_name} {last_name}"
 
 
 def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20, num_clubs_per_student=5, student_leader_pct=0.1, min_leaders=3):
@@ -151,6 +153,7 @@ def generate_student_club_pairs(num_students=200, club_names=None, num_clubs=20,
     while len(students) < num_students:
         students.append(generate_names())
         students = list(set(students))
+        students.sort()
     student_club_pairs = {club_name: [] for club_name in club_names}
     for i, student in enumerate(students):
         clubs = random.sample(club_names, k=num_clubs_per_student)
