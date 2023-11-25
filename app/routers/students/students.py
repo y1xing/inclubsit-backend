@@ -104,7 +104,7 @@ async def get_student_recommended(student_id: str, response: Response):
     # If the student is not part of any club, recommend random clubs
     # 7 = SMC, therefore suggest a random club from other categories
     if counts[0][0] == 1:
-        category = rand.randint(2, 7)
+        category = rand.randint(1, 6)
     else:
         category = counts[0][0]
 
