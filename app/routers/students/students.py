@@ -114,7 +114,7 @@ async def get_student_recommended(student_id: str, response: Response):
         WHERE C.ClubCategoryID = %s \
         AND C.ClubCategoryID = CC.ClubCategoryID \
         AND C.ClubID NOT IN (SELECT ClubID FROM ClubMember WHERE StudentID = %s) \
-        ORDER BY RAND() LIMIT 5", (category, student_id,))    
+        ORDER BY RAND() LIMIT 5", (category, student_id,))
     images = firebase_adapter.get_club_images()
     result = [club + (images[str(club[0])]['logo'],) for club in clubs]
 
@@ -131,7 +131,22 @@ async def get_student_clubs(student_id: str, response: Response):
         "SELECT c.ClubID, c.ClubName, c.ClubDescription  FROM Club c INNER JOIN ClubMember cm ON c.ClubID = cm.ClubID WHERE cm.StudentID = %s",  (student_id,))
 
     images = firebase_adapter.get_club_images()
-    result = [club + (images[str(club[0])]['logo'],) for club in clubs]
+    result = [
+        club + (images[str(club[0])]['logo'],) for club in clubs]
+
+    for index, club in enumerate(result):
+        club_id = club[0]
+        role = 0
+        row = sql_adapter.query(
+            "SELECT at.AccountTypeID, at.TypeName FROM ClubMember cm LEFT JOIN AccountType at ON cm.AccountTypeID = at.AccountTypeID WHERE cm.StudentID = %s AND cm.ClubID = %s", (
+                student_id, club_id,)
+        )
+
+        if len(row) > 0:
+            role = row[0][0]
+
+        result[index] = result[index] + (role, )
+
     return {"message": "All student's club data fetched successfully", "data": result}
 
 
