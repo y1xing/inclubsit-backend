@@ -42,6 +42,8 @@ services:
             SQL_PASSWORD: secret
         ports:
             - 8001:80
+        expose:
+            - 8001
         links:
             - mysql:mysql
         restart: always
