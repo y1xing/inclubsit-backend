@@ -86,7 +86,11 @@ class SQLAdapter:
             >>> sql.query("SELECT * FROM Club WHERE ClubID = %s", (1,))
             >>> sql.query("INSERT INTO Club (ClubName, ClubCategoryID, ClubDescription) VALUES (%s, %s, %s), ("Test Club", 1, "This is a test club")")
         """
-        cursor = self.db.cursor()
+        try:
+            cursor = self.db.cursor()
+        except mysql.connector.errors.OperationalError:
+            self.reconnect()
+            cursor = self.db.cursor()
         self.db.start_transaction()
         data = []
         try:
@@ -98,6 +102,41 @@ class SQLAdapter:
         self.db.commit()
         cursor.close()
         return data
+
+    def reconnect(self):
+        """Attempts to reconnect to the SQL database.
+        """
+        config = {
+            **dotenv_values(".env"),
+            **os.environ
+        }
+        try:
+            if "SQL_PORT" in config:
+                self.db = mysql.connector.connect(
+                    user=config["SQL_USER"],
+                    password=config["SQL_PASSWORD"],
+                    host=config["SQL_HOST"],
+                    database=config["SQL_DATABASE"],
+                    port=config["SQL_PORT"]
+                )
+            else:
+                self.db = mysql.connector.connect(
+                    user=config["SQL_USER"],
+                    password=config["SQL_PASSWORD"],
+                    host=config["SQL_HOST"],
+                    database=config["SQL_DATABASE"]
+                )
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print(err)
+                print("Something is wrong with your SQL username or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print(err)
+                print("Database does not exist")
+            else:
+                print(err)
+        else:
+            print("SQL connection successful")
 
     def add(self, collection_path, data, document_id=None):
         """
